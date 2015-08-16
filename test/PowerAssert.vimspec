@@ -14,7 +14,7 @@ Describe PowerAssert
     End
 
     It throws abort exception with falsy expression
-      Throws /vital: PowerAssert: abort/ :execute PowerAssert.assert('2 == 1')
+      Throws /vital: PowerAssert:/ :execute PowerAssert.assert('2 == 1')
     End
   End
 
@@ -25,7 +25,7 @@ Describe PowerAssert
 
     It throws abort exception if bool is false
       let g:sfuncs = sfuncs
-      Throws /vital: PowerAssert: abort/ :execute g:sfuncs._assert(0, '2 == 1')
+      Throws /vital: PowerAssert:/ :execute g:sfuncs._assert(0, '2 == 1')
       unlet g:sfuncs
     End
   End

@@ -51,7 +51,11 @@ endfunction
 " from evaluated_nodes which evaluated in the same scope with caller's one
 function! s:_throw_cmd(whole_expr, evaluated_nodes) abort
   let msgs = s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
-  return s:_pseudo_throw_cmd(join(msgs, "\n"))
+  if get(g:, 'vital_powerassert_pseudo_throw', 1)
+    return s:_pseudo_throw_cmd(join(msgs, "\n"))
+  else
+    return s:_build_actual_throw_cmd(join(msgs, "\n"))
+  endif
 endfunction
 
 " Vim cannot output multiple lines with `:echom` nor `:throw`, so execute
@@ -71,6 +75,10 @@ function! s:_pseudo_throw_cmd(msg, ...) abort
   \   '  echohl None',
   \   'endtry'
   \ ] + (do_throw ? ['throw "vital: PowerAssert: abort"'] : []), '|')
+endfunction
+
+function! s:_build_actual_throw_cmd(msg) abort
+  return printf('throw "vital: PowerAssert:\n%s"', a:msg)
 endfunction
 
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
