@@ -1,14 +1,23 @@
 Describe PowerAssert
 
   Before all
-    let s:V = vital#of('vital')
-    let s:PowerAssert = s:V.import('Vim.PowerAssert')
+    let V = vital#of('vital')
+    let PowerAssert = V.import('Vim.PowerAssert')
+    let s:assert = PowerAssert.assert
+    let ScriptLocal = V.import('Vim.ScriptLocal')
+    let sfuncs = ScriptLocal.sfuncs('autoload/vital/__latest__/Vim/PowerAssert.vim')
   End
 
-  Describe .TODO
-    It TODO
-      TODO
+  Describe .assert
+
+    It does nothing if given expression is true
+      execute s:assert('1 == 1')
     End
+
+    It throws abort exception with falsy expression
+      Throws /vital: PowerAssert: abort/ :execute PowerAssert.assert('2 == 1')
+    End
+
   End
 
 End
