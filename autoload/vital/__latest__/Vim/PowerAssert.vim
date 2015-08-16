@@ -26,26 +26,54 @@ endfunction
 function! s:_assert(bool, expr_str) abort
   if ! a:bool
     let nodes = s:_inspect(a:expr_str)
-    let args = map(nodes, 's:_node_to_str(v:val)')
-    return 'execute "call" "' . escape((s:_funcname('s:_eval_nodes') . printf('(%s, [%s])', string(a:expr_str), join(args, ', '))), '"') . '"'
+    let args = map(nodes, 's:_node_to_evaluated_node_str(v:val)')
+    return 'execute "execute" "' . escape((s:_funcname('s:_throw_cmd') . printf('(%s, [%s])', string(a:expr_str), join(args, ', '))), '"') . '"'
+  else
+    return ''
   endif
-  return 0
 endfunction
 
-function! s:_node_to_str(node) abort
+" To eval `expr` and get `col` and evaluated expression
+function! s:_node_to_evaluated_node_str(node) abort
   return printf("{'col': %s, 'expr': %s}", a:node.pos.col, a:node.expr)
 endfunction
 
-function! s:_eval_nodes(whole_expr, inspects) abort
-  echo a:whole_expr
-  let cols = sort(map(copy(a:inspects), 'v:val.col'), 'n')
-  echo s:_cols_to_str(cols)
-  for inspect in reverse(s:List.sort_by(a:inspects, 'v:val.col'))
+function! s:_throw_cmd(whole_expr, evaluated_nodes) abort
+  let msgs = s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
+  return s:_pseudo_throw_cmd(join(msgs, "\n"))
+endfunction
+
+" Vim cannot output multiple lines with `:echom` nor `:throw`, so execute
+" `:echom` each line and execute `:throw` additionally just for aborting
+function! s:_pseudo_throw_cmd(msg, ...) abort
+  let do_throw = get(a:, 1, 1)
+  return join([
+  \   'try',
+  \   '  throw ' . string(a:msg),
+  \   'catch',
+  \   '  echohl ErrorMsg',
+  \   '  echom v:throwpoint',
+  \   '  for s:__vital_assert_line in split(v:exception, "\n")',
+  \   '    echom s:__vital_assert_line',
+  \   '  endfor',
+  \   '  unlet s:__vital_assert_line',
+  \   '  echohl None',
+  \   'endtry'
+  \ ] + (do_throw ? ['throw "vital: PowerAssert: abort"'] : []), '|')
+endfunction
+
+" @evaluated_nodes List[{'col': Number, 'expr': Expr}]
+function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
+  let lines = [a:whole_expr]
+  let cols = sort(map(copy(a:evaluated_nodes), 'v:val.col'), 'n')
+  let lines += [s:_cols_to_str(cols)]
+  for inspect in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.col'))
     let col = s:_pop(cols)
     let line = s:_cols_to_str(cols)
     let line .= repeat(' ', col - len(line) - 1) . string(inspect.expr)
-    echo line
+    let lines += [line]
   endfor
+  return lines
 endfunction
 
 function! s:_cols_to_str(cols) abort
