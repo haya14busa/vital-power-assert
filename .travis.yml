@@ -1,0 +1,45 @@
+language: generic
+env:
+  - HEAD=yes
+  - HEAD=no
+sudo: false
+cache: pip
+
+addons:
+  apt:
+    packages:
+      - language-pack-ja
+      - vim
+      - libperl-dev
+      - python-dev
+      - python3-dev
+      - liblua5.1-0-dev
+      - lua5.1
+
+install:
+  # Vim
+  - bash ./test/install-vim.sh
+  - if [ x"$HEAD" = "xyes" ]; then export PATH=$HOME/vim/bin:$PATH; fi
+  # vint
+  - pip install vim-vint --user
+  - export PATH=$HOME/.local/bin:$PATH
+  # vimlint
+  - git clone https://github.com/syngan/vim-vimlint /tmp/vim-vimlint
+  - git clone https://github.com/ynkdir/vim-vimlparser /tmp/vim-vimlparser
+  # themis
+  - git clone https://github.com/thinca/vim-themis --branch v1.4.1 --single-branch --depth 1 /tmp/vim-themis
+  # testing helper
+  - git clone https://github.com/vim-jp/vital.vim /tmp/vital.vim  # for testing if required
+  - git clone https://github.com/haya14busa/vital-vimlcompiler /tmp/vital-vimlcompiler
+
+before_script:
+  - vim --version
+  - vint --version
+
+script:
+  - which -a vim
+  - vim --cmd version --cmd quit
+  - if [ -e doc/ ]; then vim --cmd 'try | helptags doc/ | catch | cquit | endtry' --cmd 'quit'; fi
+  - sh /tmp/vim-vimlint/bin/vimlint.sh -l /tmp/vim-vimlint -p /tmp/vim-vimlparser -e EVL103=1 -e EVL102.l:_=1 -c func_abort=1 ./autoload/vital/__latest__/Vim/PowerAssert.vim
+  - vint --color ./autoload/vital/__latest__/Vim/PowerAssert.vim
+  - /tmp/vim-themis/bin/themis --runtimepath /tmp/vital.vim --runtimepath /tmp/vital-vimlcompiler --reporter spec

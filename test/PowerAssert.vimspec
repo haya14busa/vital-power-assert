@@ -1,0 +1,14 @@
+Describe PowerAssert
+
+  Before all
+    let s:V = vital#of('vital')
+    let s:PowerAssert = s:V.import('Vim.PowerAssert')
+  End
+
+  Describe .TODO
+    It TODO
+      TODO
+    End
+  End
+
+End
