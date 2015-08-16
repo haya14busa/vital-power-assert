@@ -21,6 +21,7 @@ endfunction
 " RETURN: command to execute (s:_assert()) to evaluate given expression
 " in the same scope with caller's one
 function! s:assert(expr_str) abort
+  " assert !empty(empty_str)
   let _assert = s:_funcname('s:_assert')
   let args = printf('%s, %s', a:expr_str, string(a:expr_str))
   let rhs = escape(printf('%s(%s)', _assert, args), '"')
@@ -31,6 +32,7 @@ endfunction
 " RETURN: throw command which display graphical assertion result if bool is
 " falsy
 function! s:_assert(bool, expr_str) abort
+  " assert !empty(empty_str)
   if ! a:bool
     " Aggregate nodes to evaluate which we want to inspect and eval in the
     " same scope with caller's one by returnign comamnd with nodes to eval as
@@ -251,7 +253,7 @@ function! s:_next_evaluatable_node(node) abort
   elseif a:node.type == s:VimlParser.NODE_SUBSCRIPT
     return [a:node.left, a:node.right]
   elseif a:node.type == s:VimlParser.NODE_SLICE
-    return [a:node.left] + a:node.rlist
+    return [a:node.left] + filter(copy(a:node.rlist), 'type(v:val) is# type({})')
   elseif a:node.type == s:VimlParser.NODE_DOT
     " Right is just a accessor
     return [a:node.left]
@@ -279,7 +281,7 @@ function! s:_next_evaluatable_node(node) abort
   elseif a:node.type == s:VimlParser.NODE_CURLYNAMEPART
     return []
   elseif a:node.type == s:VimlParser.NODE_CURLYNAMEEXPR
-    return []
+    return type(a:node.value.value) is# type([]) ? [a:node.value] : []
   else
     throw printf('PowerAssert: unknown node: %s', string(a:node))
   endif
@@ -310,12 +312,14 @@ function! s:_compile(expr_node) abort
 endfunction
 
 function! s:_parse_expr(expr_str) abort
+  " assert !empty(empty_str)
   let reader = s:VimlParser.StringReader.new(a:expr_str)
   let expr_parser = s:VimlParser.ExprParser.new(reader)
   return expr_parser.parse()
 endfunction
 
 function! s:_aggregate_nodes_to_eval(expr_str) abort
+  " assert !empty(empty_str)
   let node = s:_parse_expr(a:expr_str)
   let nodes_to_eval = s:_filter_out_primitive_node(s:_flatten_evaluatable_node(node))
   return map(nodes_to_eval, 's:_compile_expr_with_pos(v:val)')
