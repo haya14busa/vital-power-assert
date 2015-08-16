@@ -18,26 +18,35 @@ function! s:_vital_depends() abort
   return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List']
 endfunction
 
+" RETURN: command to execute (s:_assert()) to evaluate given expression
+" in the same scope with caller's one
 function! s:assert(expr_str) abort
-  let args = printf('(%s, %s)', a:expr_str, string(a:expr_str))
-  return 'execute "execute" "' . escape((s:_funcname('s:_assert') . args), '"') . '"'
+  let _assert = s:_funcname('s:_assert')
+  let args = printf('%s, %s', a:expr_str, string(a:expr_str))
+  let rhs = escape(printf('%s(%s)', _assert, args), '"')
+  return 'execute "execute" "' . rhs . '"'
 endfunction
 
+" @bool: evaluated expr_str
+" RETURN: throw command which display graphical assertion result if bool is
+" falsy
 function! s:_assert(bool, expr_str) abort
   if ! a:bool
-    let nodes = s:_inspect(a:expr_str)
-    let args = map(nodes, 's:_node_to_evaluated_node_str(v:val)')
-    return 'execute "execute" "' . escape((s:_funcname('s:_throw_cmd') . printf('(%s, [%s])', string(a:expr_str), join(args, ', '))), '"') . '"'
+    " Aggregate nodes to evaluate which we want to inspect and eval in the
+    " same scope with caller's one by returnign comamnd with nodes to eval as
+    " arguments.
+    let nodes = map(s:_aggregate_nodes_to_eval(a:expr_str), 's:_node_to_eval_str(v:val)')
+    let _throw_cmd = s:_funcname('s:_throw_cmd')
+    let args = printf('%s, [%s]', string(a:expr_str), join(nodes, ', '))
+    let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"')
+    return 'execute "execute" "' . rhs . '"'
   else
     return ''
   endif
 endfunction
 
-" To eval `expr` and get `col` and evaluated expression
-function! s:_node_to_evaluated_node_str(node) abort
-  return printf("{'col': %s, 'expr': %s}", a:node.pos.col, a:node.expr)
-endfunction
-
+" RETURN: generate pseudo-throw command with graphical assertion result
+" from evaluated_nodes which evaluated in the same scope with caller's one
 function! s:_throw_cmd(whole_expr, evaluated_nodes) abort
   let msgs = s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
   return s:_pseudo_throw_cmd(join(msgs, "\n"))
@@ -65,18 +74,20 @@ endfunction
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
 function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
   let lines = [a:whole_expr]
-  let cols = sort(map(copy(a:evaluated_nodes), 'v:val.col'), 'n')
-  let lines += [s:_cols_to_str(cols)]
-  for inspect in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.col'))
-    let col = s:_pop(cols)
-    let line = s:_cols_to_str(cols)
-    let line .= repeat(' ', col - len(line) - 1) . string(inspect.expr)
+  let cols = sort(map(copy(a:evaluated_nodes), 'v:val.pos.col'), 'n')
+  let lines += [s:_cols_line(cols)]
+  for node_with_pos in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.pos.col'))
+    let col = s:List.pop(cols)
+    let line = s:_cols_line(cols)
+    let line .= repeat(' ', col - len(line) - 1) . string(node_with_pos.expr)
     let lines += [line]
   endfor
   return lines
 endfunction
 
-function! s:_cols_to_str(cols) abort
+" >>> echo s:_cols_line([1, 2, 5, 10])
+" ||  |    |
+function! s:_cols_line(cols) abort
   let max = max(a:cols)
   let strs = map(range(max), '" "')
   for col in a:cols
@@ -87,14 +98,14 @@ endfunction
 
 " RETURN: [Node, ...]
 " NODE: which could be evaluated
-function! s:_flatten_node(expr_node) abort
+function! s:_flatten_evaluatable_node(expr_node) abort
   let stack = [a:expr_node]
   let flat_nodes = []
 
   while !empty(stack)
-    let node = s:_pop(stack)
+    let node = s:List.pop(stack)
     if node.type isnot# s:VimlParser.NODE_CURLYNAME
-      call s:_push(flat_nodes, node)
+      call s:List.push(flat_nodes, node)
     endif
     let stack += s:_next_evaluatable_node(node)
   endwhile
@@ -254,7 +265,7 @@ function! s:_next_evaluatable_node(node) abort
   elseif a:node.type == s:VimlParser.NODE_LIST
     return a:node.value
   elseif a:node.type == s:VimlParser.NODE_DICT
-    return s:_flatten(a:node.value)
+    return s:List.flatten(a:node.value)
   elseif a:node.type == s:VimlParser.NODE_OPTION
     return []
   elseif a:node.type == s:VimlParser.NODE_IDENTIFIER
@@ -274,7 +285,7 @@ function! s:_next_evaluatable_node(node) abort
   endif
 endfunction
 
-function! s:_filter_to_inspect_nodes(nodes) abort
+function! s:_filter_out_primitive_node(nodes) abort
   let excludes = [
   \   s:VimlParser.NODE_NUMBER,
   \   s:VimlParser.NODE_STRING,
@@ -284,8 +295,13 @@ function! s:_filter_to_inspect_nodes(nodes) abort
   return filter(copy(a:nodes), 'index(excludes, v:val.type) is# -1')
 endfunction
 
-function! s:_to_expr_with_pos(node) abort
+" To eval `expr` and get `pos` and evaluated expression
+function! s:_compile_expr_with_pos(node) abort
   return {'pos': a:node.pos, 'expr': s:_compile(a:node)}
+endfunction
+
+function! s:_node_to_eval_str(node) abort
+  return printf("{'pos': %s, 'expr': %s}", string(a:node.pos), a:node.expr)
 endfunction
 
 function! s:_compile(expr_node) abort
@@ -299,36 +315,10 @@ function! s:_parse_expr(expr_str) abort
   return expr_parser.parse()
 endfunction
 
-function! s:_inspect(expr_str) abort
+function! s:_aggregate_nodes_to_eval(expr_str) abort
   let node = s:_parse_expr(a:expr_str)
-  return map(s:_filter_to_inspect_nodes(s:_flatten_node(node)), 's:_to_expr_with_pos(v:val)')
-endfunction
-
-function! s:_pop(list) abort
-  return remove(a:list, -1)
-endfunction
-
-function! s:_push(list, val) abort
-  call add(a:list, a:val)
-  return a:list
-endfunction
-
-" Take each elements from lists to a new list.
-function! s:_flatten(list, ...) abort
-  let limit = a:0 > 0 ? a:1 : -1
-  let memo = []
-  if limit == 0
-    return a:list
-  endif
-  let limit -= 1
-  for Value in a:list
-    let memo +=
-          \ type(Value) == type([]) ?
-          \   s:_flatten(Value, limit) :
-          \   [Value]
-    unlet! Value
-  endfor
-  return memo
+  let nodes_to_eval = s:_filter_out_primitive_node(s:_flatten_evaluatable_node(node))
+  return map(nodes_to_eval, 's:_compile_expr_with_pos(v:val)')
 endfunction
 
 function! s:_SID() abort
