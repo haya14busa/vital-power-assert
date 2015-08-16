@@ -9,7 +9,6 @@ Describe PowerAssert
   End
 
   Describe .assert
-
     It does nothing if given expression is true
       execute s:assert('1 == 1')
     End
@@ -17,7 +16,190 @@ Describe PowerAssert
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert: abort/ :execute PowerAssert.assert('2 == 1')
     End
+  End
 
+  Describe ._assert
+    It returns empty string if bool is true
+      Assert Equals(sfuncs._assert(1, 'vim'), '')
+    End
+
+    It throws abort exception if bool is false
+      let g:sfuncs = sfuncs
+      Throws /vital: PowerAssert: abort/ :execute g:sfuncs._assert(0, '2 == 1')
+      unlet g:sfuncs
+    End
+  End
+
+  Describe ._next_evaluatable_node
+    It string
+      let node = sfuncs._parse_expr('"hoge"')
+      Assert Equals(sfuncs._next_evaluatable_node(node), [])
+    End
+
+    It number
+      let node = sfuncs._parse_expr('1')
+      Assert Equals(sfuncs._next_evaluatable_node(node), [])
+    End
+
+    It list
+      let node = sfuncs._parse_expr('[1, 2]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It dict
+      let node = sfuncs._parse_expr('{ key : value }')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It ternary
+      let node = sfuncs._parse_expr('1 ? 2 : 3')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 3)
+    End
+
+    It or
+      let node = sfuncs._parse_expr('1 || 3')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It not
+      let node = sfuncs._parse_expr('!1')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It plus
+      let node = sfuncs._parse_expr('+1')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It minus
+      let node = sfuncs._parse_expr('-1')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It subscript
+      let node = sfuncs._parse_expr('x[y]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It slice x[y : z]
+      let node = sfuncs._parse_expr('x[y : z]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 3)
+    End
+
+    It slice x[ : z]
+      let node = sfuncs._parse_expr('x[ : z]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It slice x[y : ]
+      let node = sfuncs._parse_expr('x[y : ]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It slice x[ : ]
+      let node = sfuncs._parse_expr('x[ : ]')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It . (dot)
+      let node = sfuncs._parse_expr('x.y')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+      Assert Equals(sfuncs._next_evaluatable_node(node)[0].value, 'x')
+    End
+
+    It nested . (dot)
+      let node = sfuncs._parse_expr('x.y.z')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+      Assert Equals(sfuncs._next_evaluatable_node(node)[0].left.value, 'x')
+      Assert Equals(sfuncs._next_evaluatable_node(node)[0].right.value, 'y')
+    End
+
+    It call (with empty args)
+      let node = sfuncs._parse_expr('x()')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 0)
+    End
+
+    It call (with one arg)
+      let node = sfuncs._parse_expr('x(y)')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+      Assert Equals(sfuncs._next_evaluatable_node(node)[0].value, 'y')
+    End
+
+    It call (with multiple args)
+      let node = sfuncs._parse_expr('x(y, z)')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 2)
+    End
+
+    It call (with curly name)
+      let node = sfuncs._parse_expr('x{c}y()')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It curlyname
+      let node = sfuncs._parse_expr('x{c}y')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
+    It nested curlyname
+      let node = sfuncs._parse_expr('x{c{nest}}y')
+      let next = sfuncs._next_evaluatable_node(node)
+      Assert Equals(len(next), 1)
+      let nested1 = sfuncs._next_evaluatable_node(next[0])
+      Assert Equals(len(nested1), 1)
+      let nested2 = sfuncs._next_evaluatable_node(nested1[0])
+      Assert Equals(len(nested2), 1)
+      Assert Equals(nested2[0].value.value, 'nest')
+    End
+
+    It curlynameexpr
+      let node = sfuncs._parse_expr('{c}')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+      Assert Equals(sfuncs._next_evaluatable_node(node)[0].value.value, 'c')
+    End
+  End
+
+
+  Describe ._compile_expr_with_pos
+    It should compile expression with pos
+      let node = sfuncs._parse_expr('1 ? 2 : 3')
+      let expect = {'pos': {'lnum': 1, 'col': 3, 'i': 2}, 'expr': '(1 ? 2 : 3)'}
+      Assert Equals(sfuncs._compile_expr_with_pos(node), expect)
+    End
+  End
+
+  Describe ._node_to_eval_str
+    It should return string node to eval
+      let node = sfuncs._compile_expr_with_pos(sfuncs._parse_expr('1 ? 2 : 3'))
+      let node_str = sfuncs._node_to_eval_str(node)
+      let expect = "{'pos': {'lnum': 1, 'col': 3, 'i': 2}, 'expr': (1 ? 2 : 3)}"
+      Assert IsString(node_str)
+      Assert Equals(node_str, expect)
+    End
+  End
+
+  Describe ._compile
+    It should compile expression node
+      let node = sfuncs._parse_expr('1 ? 2 : 3')
+      Assert Equals(sfuncs._compile(node), '(1 ? 2 : 3)')
+    End
+  End
+
+  Describe ._parse_expr
+    It should parse expr string
+      let node = sfuncs._parse_expr('1 ? 2 : 3')
+      Assert HasKey(node, 'type')
+    End
+  End
+
+  Describe ._aggregate_nodes_to_eval
+    It should aggregates nodes to eval (which we want to inspect actual value)
+      let nodes = sfuncs._aggregate_nodes_to_eval('1 ? x : y.z')
+      Assert Equals(len(nodes), 4)
+      Assert Equals(nodes[0].expr, '(1 ? x : (y.z))')
+      Assert Equals(nodes[1].expr, '(y.z)')
+      Assert Equals(nodes[2].expr, 'y')
+      Assert Equals(nodes[3].expr, 'x')
+    End
   End
 
 End
