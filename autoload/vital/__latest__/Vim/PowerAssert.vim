@@ -18,6 +18,18 @@ function! s:_vital_depends() abort
   return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List']
 endfunction
 
+" @__debug__ Bool Do not run anything if it's false
+"_@_pseudo_throw__ Bool Echo messages, then throw abort exception if it's true
+" or just `:throw` them.(`:throw` cannot output message with breaklines).
+" NOTE: if someone `unlet` g:__vital_power_assert_config, it throws exception
+" in production regardless config so use `get()` to get global config
+function! s:_config() abort
+  return extend({
+  \   '__debug__': 0,
+  \   '__pseudo_throw__': 1
+  \ }, get(g:, '__vital_power_assert_config', {}))
+endfunction
+
 function! s:define(cmdname) abort
   let cmd = printf("'command!' '-nargs=*' '%s' ':execute' \"%s(<q-args>)\"", a:cmdname, s:_funcname('s:assert'))
   return 'execute ' . cmd
@@ -27,11 +39,15 @@ endfunction
 " in the same scope with caller's one
 " TODO: support additional message
 function! s:assert(expr_str) abort
-  " assert !empty(empty_str)
-  let _assert = s:_funcname('s:_assert')
-  let args = printf('%s, %s', a:expr_str, string(a:expr_str))
-  let rhs = escape(printf('%s(%s)', _assert, args), '"')
-  return 'execute "execute" "' . rhs . '"'
+  if s:_config().__debug__
+    " assert !empty(empty_str)
+    let _assert = s:_funcname('s:_assert')
+    let args = printf('%s, %s', a:expr_str, string(a:expr_str))
+    let rhs = escape(printf('%s(%s)', _assert, args), '"')
+    return 'execute "execute" "' . rhs . '"'
+  else
+    return ''
+  endif
 endfunction
 
 " @bool: evaluated expr_str
@@ -57,7 +73,7 @@ endfunction
 " from evaluated_nodes which evaluated in the same scope with caller's one
 function! s:_throw_cmd(whole_expr, evaluated_nodes) abort
   let msgs = s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
-  if get(g:, 'vital_powerassert_pseudo_throw', 1)
+  if s:_config().__pseudo_throw__
     return s:_pseudo_throw_cmd(join(msgs, "\n"))
   else
     return s:_build_actual_throw_cmd(join(msgs, "\n"))
