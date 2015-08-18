@@ -1,0 +1,68 @@
+Describe config
+
+  Before all
+    let V = vital#of('vital')
+    let g:PowerAssert = V.import('Vim.PowerAssert')
+    let s:assert = g:PowerAssert.assert
+  End
+
+  Describe g:__vital_power_assert_config
+    It should work without this variable
+      let _save = get(g:, '__vital_power_assert_config', {})
+      try
+        let x = 'vim'
+        execute s:assert('x != "vi"')
+        Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('x == "vi"')
+      finally
+        let g:__vital_power_assert_config = _save
+      endtry
+    End
+
+    It should not throw exception for falsy one if __debug__ option is off
+      let _save = get(g:, '__vital_power_assert_config', {})
+      try
+        for pseudo_option in [0, 1]
+          let g:__vital_power_assert_config = {
+          \   '__debug__': 0,
+          \   '__pseudo_throw__': pseudo_option
+          \ }
+          execute s:assert('x != "vi"')
+          execute s:assert('x == "vi"')
+        endfor
+      finally
+        let g:__vital_power_assert_config = _save
+      endtry
+    End
+
+    It should throw abort exception with __pseudo_throw__ is true
+      let _save = get(g:, '__vital_power_assert_config', {})
+      let g:__vital_power_assert_config = {
+      \   '__debug__': 1,
+      \   '__pseudo_throw__': 1
+      \ }
+      try
+        let x = 'vim'
+        execute s:assert('x != "vi"')
+        Throws /^vital: PowerAssert: abort$/ :execute g:PowerAssert.assert('x == "vi"')
+      finally
+        let g:__vital_power_assert_config = _save
+      endtry
+    End
+
+    It should throw exception with __pseudo_throw__ is false
+      let _save = get(g:, '__vital_power_assert_config', {})
+      let g:__vital_power_assert_config = {
+      \   '__debug__': 1,
+      \   '__pseudo_throw__': 0
+      \ }
+      try
+        let x = 'vim'
+        execute s:assert('x != "vi"')
+        Throws /^vital: PowerAssert:\n/ :execute g:PowerAssert.assert('x == "vi"')
+      finally
+        let g:__vital_power_assert_config = _save
+      endtry
+    End
+  End
+
+End
