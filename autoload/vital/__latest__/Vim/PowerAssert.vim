@@ -19,7 +19,7 @@ function! s:_vital_depends() abort
 endfunction
 
 function! s:define(cmdname) abort
-  let cmd = printf("'command!' '-nargs=*' '%s' ':execute' \"%s('<args>')\"", a:cmdname, s:_funcname('s:assert'))
+  let cmd = printf("'command!' '-nargs=*' '%s' ':execute' \"%s(<q-args>)\"", a:cmdname, s:_funcname('s:assert'))
   return 'execute ' . cmd
 endfunction
 
