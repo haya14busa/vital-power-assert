@@ -1,0 +1,36 @@
+Describe command
+
+  Before all
+    let V = vital#of('vital')
+    let PowerAssert = V.import('Vim.PowerAssert')
+    " to see script-local scope
+    execute PowerAssert.define('AssertCmd')
+  End
+
+  Describe .define()
+    It should define command with given command name
+      execute PowerAssert.define('CommandTest')
+      Assert Exists(':CommandTest')
+      delcommand CommandTest
+    End
+
+    It does nothing if given expression is true
+      AssertCmd 1 == 1
+    End
+
+    It throws abort exception with falsy expression
+      Throws /vital: PowerAssert:/ :AssertCmd 2 == 1
+    End
+
+    It command can access caller scope variables
+      let s:x = 'xxx'
+      let l:xxx = 'y'
+      let b:x = 'zzz'
+      let t:x = 'ttt'
+      AssertCmd s:x != l:xxx && b:x != t:x
+      Throws /vital: PowerAssert:/ :AssertCmd s:x == l:xxx || b:x == t:x
+      unlet b:x s:x t:x
+    End
+  End
+
+End
