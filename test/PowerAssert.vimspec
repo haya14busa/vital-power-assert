@@ -13,6 +13,11 @@ Describe PowerAssert
       execute s:assert('1 == 1')
     End
 
+    It support func call
+      let xs = [1, 2, 3]
+      execute s:assert('index(xs, 2) == 1')
+    End
+
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert:/ :execute PowerAssert.assert('2 == 1')
     End
