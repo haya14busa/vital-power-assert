@@ -1,0 +1,51 @@
+Describe TODO
+
+  Before all
+    let V = vital#of('vital')
+    let PowerAssert = V.import('Vim.PowerAssert')
+    let s:assert = PowerAssert.assert
+  End
+
+  It should inspect nodes regardless exception from other evaluations
+    Skip 'not implemented yet'
+    let x = {}
+    " E15
+    execute s:assert('0 == {}')
+  End
+
+  It should inspect nodes in 'string' arg for `map()`
+    Skip 'not implemented yet'
+    let x = 2
+    execute s:assert('[] == map([1, 2, 3], "v:val * x")')
+  End
+
+  It should inspect nodes in 'string' arg for `filter()`
+    Skip 'not implemented yet'
+    let x = 2
+    execute s:assert('[] == filter([1, 2, 3], "v:val % x")')
+  End
+
+  It should not inspect `v:val` in 'string' arg for `map()`/ `filter()`
+    Skip 'not implemented yet'
+    execute s:assert('[] == map([1, 2, 3], "v:val * v:val")')
+  End
+
+  It should output diff between left and right string of binary operaration
+    Skip 'not implemented yet'
+    let x = 'vim'
+    let y = 'Vim'
+    execute s:assert('x is# y')
+  End
+
+  It should inspect right node of dot node if the dot means string concatenation
+    Skip 'not implemented yet'
+    let x = 'vim'
+    let y = 'Vim'
+    execute s:assert('x.y == "hi"')
+  End
+
+  It should accept and output additional message to assert
+    Skip 'not implemented yet'
+    execute s:assert('x.y == "hi"', 'additional message')
+  End
+End
