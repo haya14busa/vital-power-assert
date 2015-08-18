@@ -18,6 +18,20 @@ Describe PowerAssert
       execute s:assert('index(xs, 2) == 1')
     End
 
+    It should support expression with double quote
+      let _save = g:vital_powerassert_pseudo_throw
+      for bool in [0, 1]
+        let g:vital_powerassert_pseudo_throw = bool
+        try
+          let x = 'vim'
+          execute s:assert('x != "vi"')
+          Throws /vital: PowerAssert:/ :execute PowerAssert.assert('x == "vi"')
+        finally
+          let g:vital_powerassert_pseudo_throw = _save
+        endtry
+      endfor
+    End
+
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert:/ :execute PowerAssert.assert('2 == 1')
     End
