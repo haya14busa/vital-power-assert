@@ -84,7 +84,7 @@ function! s:_pseudo_throw_cmd(msg, ...) abort
 endfunction
 
 function! s:_build_actual_throw_cmd(msg) abort
-  return printf('throw "vital: PowerAssert:\n%s"', a:msg)
+  return printf('throw "vital: PowerAssert:\n%s"', escape(a:msg, '"'))
 endfunction
 
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
