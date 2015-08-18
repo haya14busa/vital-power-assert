@@ -2,15 +2,20 @@ Describe PowerAssert
 
   Before all
     let V = vital#of('vital')
-    let PowerAssert = V.import('Vim.PowerAssert')
-    let s:assert = PowerAssert.assert
+    let g:PowerAssert = V.import('Vim.PowerAssert')
+    let s:assert = g:PowerAssert.assert
     let ScriptLocal = V.import('Vim.ScriptLocal')
     let sfuncs = ScriptLocal.sfuncs('autoload/vital/__latest__/Vim/PowerAssert.vim')
   End
 
+  function! CheckThrow(expr) abort
+    return printf("Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('%s')", a:expr)
+  endfunction
+
   Describe .assert
     It does nothing if given expression is true
       execute s:assert('1 == 1')
+      execute s:assert('1')
     End
 
     It support func call
@@ -25,7 +30,21 @@ Describe PowerAssert
         try
           let x = 'vim'
           execute s:assert('x != "vi"')
-          Throws /vital: PowerAssert:/ :execute PowerAssert.assert('x == "vi"')
+          Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('x == "vi"')
+        finally
+          let g:vital_powerassert_pseudo_throw = _save
+        endtry
+      endfor
+    End
+
+    It should support expression with single quote
+      let _save = g:vital_powerassert_pseudo_throw
+      for bool in [0, 1]
+        let g:vital_powerassert_pseudo_throw = bool
+        try
+          let x = 'vim'
+          execute s:assert("x != 'vi'")
+          Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert("x == 'vi'")
         finally
           let g:vital_powerassert_pseudo_throw = _save
         endtry
@@ -33,7 +52,8 @@ Describe PowerAssert
     End
 
     It throws abort exception with falsy expression
-      Throws /vital: PowerAssert:/ :execute PowerAssert.assert('2 == 1')
+      Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('2 == 1')
+      Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('0')
     End
   End
 
@@ -219,6 +239,126 @@ Describe PowerAssert
       Assert Equals(nodes[2].expr, 'y')
       Assert Equals(nodes[3].expr, 'x')
     End
+  End
+
+  Describe expect
+    Before all
+      execute g:PowerAssert.define('PowerAssert')
+    End
+
+    let num = 1
+    let str = 'foo'
+    let xs = [1, 2, 3]
+    let ys = [1, 2, [3, 4]]
+    let ds = {'foo': 'x'}
+    let nesteds = {'foo': {'x': 'y'}}
+
+    let refxs = xs
+    let refys = ys
+    let refds = ds
+    let refnesteds = nesteds
+
+    Describe equal
+      It should assert equal
+        PowerAssert num == 1
+        PowerAssert str == "foo"
+        PowerAssert xs == [1, 2, 3]
+        PowerAssert ys == [1, 2, [3, 4]]
+        PowerAssert ds == {"foo": "x"}
+        PowerAssert nesteds == {"foo": {"x": "y"}}
+      End
+      It should throws a report when values are different
+        execute CheckThrow('num == 0')
+        execute CheckThrow('str == "bar"')
+        execute CheckThrow('xs == [1, 2, 3, 4]')
+        execute CheckThrow('ys == [1, 2, []]')
+        execute CheckThrow('ds == {"foo": "y"}')
+        execute CheckThrow('nesteds == {"foo": {"x": "z"}}')
+      End
+    End
+
+    Describe same
+      It should assert same
+        PowerAssert num is 1
+        PowerAssert str is "foo"
+        PowerAssert xs is refxs
+        PowerAssert ys is refys
+        PowerAssert ds is refds
+        PowerAssert nesteds is refnesteds
+      End
+      It should throws a report when values are different
+        execute CheckThrow('num is "1"')
+        execute CheckThrow('str is "bar"')
+        execute CheckThrow('xs is [1, 2, 3]')
+        execute CheckThrow('ys is [1, 2, [3, 4]]')
+        execute CheckThrow('ds is {"foo": "x"}')
+        execute CheckThrow('nesteds is {"foo": {"x": "y"}}')
+      End
+    End
+
+    Describe match
+      It should assert match
+        PowerAssert str =~# "oo"
+        PowerAssert str !~# "vim"
+      End
+      It should throws a report when values are different
+        execute CheckThrow('str !~# "oo"')
+        execute CheckThrow('str =~# "vim"')
+      End
+    End
+
+    Describe len
+      It should assert len
+        PowerAssert len(str) is# 3
+      End
+      It should throws a report when values are different
+        execute CheckThrow('len(str) is# 444')
+      End
+    End
+
+    Describe have_key
+      It should assert have_key
+        PowerAssert has_key(ds, str)
+      End
+      It should throws a report when values are different
+        execute CheckThrow('has_key(ds, str . "xxx")')
+      End
+    End
+
+    Describe type
+      It should assert type
+        PowerAssert type(str) is type('')
+      End
+      It should throws a report when values are different
+        execute CheckThrow('type(ds) is type(1)')
+      End
+    End
+
+    Describe float
+      let f = 1.4
+      It should assert float
+        PowerAssert f is 1.4
+      End
+      It should throws a report when values are different
+        execute CheckThrow('f is 1.5')
+      End
+    End
+
+    Describe deep nested expression
+      let f = 1.4
+      let x = 'xxx'
+      It should assert float
+        PowerAssert f is 1.4 && x =~? 'x' || (len([1, 2, 3, { 'xxx': 'yyy'}]) ? x : f) =~# "xx"
+      End
+      It should throws a report when values are different
+        " XXX: something wrong with CheckThrow
+        Throws /vital: PowerAssert:/ :execute
+        \ g:PowerAssert.assert(
+        \   "f isnot 1.4 && x !~? 'x' || (len([1, 2, 3, { 'xxx': 'yyy'}]) ? x : f) is \"xx\""
+        \ )
+      End
+    End
+
   End
 
 End
