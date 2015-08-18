@@ -6,6 +6,29 @@ Describe PowerAssert
     let s:assert = PowerAssert.assert
     let ScriptLocal = V.import('Vim.ScriptLocal')
     let sfuncs = ScriptLocal.sfuncs('autoload/vital/__latest__/Vim/PowerAssert.vim')
+
+    " to see script-local scope
+    execute PowerAssert.define('AssertCmd')
+  End
+
+  Describe command
+    It does nothing if given expression is true
+      AssertCmd 1 == 1
+    End
+
+    It throws abort exception with falsy expression
+      Throws /vital: PowerAssert:/ :AssertCmd 2 == 1
+    End
+
+    It command can access caller scope variables
+      let s:x = 'xxx'
+      let l:xxx = 'y'
+      let b:x = 'zzz'
+      let t:x = 'ttt'
+      AssertCmd s:x != l:xxx && b:x != t:x
+      Throws /vital: PowerAssert:/ :AssertCmd s:x == l:xxx || b:x == t:x
+      unlet b:x s:x t:x
+    End
   End
 
   Describe .assert

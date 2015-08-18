@@ -18,8 +18,14 @@ function! s:_vital_depends() abort
   return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List']
 endfunction
 
+function! s:define(cmdname) abort
+  let cmd = printf("'command!' '-nargs=*' '%s' ':execute' \"%s('<args>')\"", a:cmdname, s:_funcname('s:assert'))
+  return 'execute ' . cmd
+endfunction
+
 " RETURN: command to execute (s:_assert()) to evaluate given expression
 " in the same scope with caller's one
+" TODO: support additional message
 function! s:assert(expr_str) abort
   " assert !empty(empty_str)
   let _assert = s:_funcname('s:_assert')
