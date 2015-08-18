@@ -18,6 +18,16 @@ Describe command
       AssertCmd 1 == 1
     End
 
+    It should support double quote
+      let x = 'foo'
+      AssertCmd x ==# 'foo'
+    End
+
+    It should support single quote
+      let x = 'foo'
+      AssertCmd x ==# "foo"
+    End
+
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert:/ :AssertCmd 2 == 1
     End
