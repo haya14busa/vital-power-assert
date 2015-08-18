@@ -316,7 +316,7 @@ endfunction
 
 function! s:_compile(expr_node) abort
   let c = s:VimlCompiler.new()
-  return c.compile(a:expr_node)
+  return c.compile(deepcopy(a:expr_node))
 endfunction
 
 function! s:_parse_expr(expr_str) abort
