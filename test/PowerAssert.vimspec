@@ -12,6 +12,28 @@ Describe PowerAssert
     return printf("Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('%s')", a:expr)
   endfunction
 
+  Describe descriptive message
+    It should output descriptive message on failure
+      execute g:PowerAssert.define('PowerAssert')
+      let msg = join([
+      \   "vital: PowerAssert:",
+      \   "index(x.ary, l:zero) is# s:two",
+      \   "     |||     |       |   |",
+      \   "     |||     |       |   2",
+      \   "     |||     |       0",
+      \   "     |||     0",
+      \   "     ||\\[1, 2, 3\\]",
+      \   "     |{'ary': \\[1, 2, 3\\], 'power': 'assert'}",
+      \   "     -1"
+      \ ], "\n")
+      let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+      let l:zero = 0
+      let s:two = 2
+      execute printf('Throws /%s/ :PowerAssert index(x.ary, l:zero) is# s:two', msg)
+      delcommand PowerAssert
+    End
+  End
+
   Describe .assert
     It does nothing if given expression is true
       execute s:assert('1 == 1')
