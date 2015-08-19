@@ -1,0 +1,195 @@
+*vital-power-assert.txt*	assertion library for Vim script
+
+
+Author  : haya14busa <hayabusa1419@gmail.com>
+Version : 0.9.0
+License : MIT license {{{
+
+  Copyright (c) 2015 haya14busa
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+}}}
+
+==============================================================================
+CONTENTS				*Vital.Vim.PowerAssert-contents*
+
+INTRODUCTION		|Vital.Vim.PowerAssert-introduction|
+INSTALLATION		|Vital.Vim.PowerAssert-installation|
+INTERFACE		|Vital.Vim.PowerAssert-interface|
+  FUNCTIONS		|Vital.Vim.PowerAssert-functions|
+  VARIABLES		|Vital.Vim.PowerAssert-variables|
+Changelog		|Vital.Vim.PowerAssert-changelog|
+
+==============================================================================
+INTRODUCTION				*Vital.Vim.PowerAssert-introduction*
+
+*Vital.Vim.PowerAssert* (*vital-power-assert* , *vital-power-assert.vim* )
+provides descriptive assertion messages with assertion function or :command.
+
+Assertion: >
+  let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+  let l:zero = 0
+  let s:two = 2
+  PowerAssert index(x.ary, l:zero) is# s:two
+  " or
+  execute s:assert('index(x.ary, l:zero) is# s:two')
+
+<Message: >
+  vital: PowerAssert:
+  index(x.ary, l:zero) is# s:two
+	|||     |       |   |
+	|||     |       |   2
+	|||     |       0
+	|||     0
+	||[1, 2, 3]
+	|{'ary': [1, 2, 3], 'power': 'assert'}
+	-1
+<
+
+==============================================================================
+INSTALLATION				*Vital.Vim.PowerAssert-installation*
+
+1. Install |vital.vim|, vital-vimlcompiler, and |vital-power-assert| with your
+favorite plugin manager.  >
+	NeoBundle 'vim-jp/vital.vim'
+	NeoBundle 'haya14busa/vital-vimlcompiler'
+	NeoBundle 'haya14busa/vital-power-assert'
+
+	Plugin 'vim-jp/vital.vim'
+	Plugin 'haya14busa/vital-vimlcompiler'
+	Plugin 'haya14busa/vital-power-assert'
+
+	Plug 'vim-jp/vital.vim'
+	Plug 'haya14busa/vital-vimlcompiler'
+	Plug 'haya14busa/vital-power-assert'
+<
+2. Embed vital-power-assert into your plugin with |:Vitalize|
+(assume current directory is the root of your plugin repository).
+See |:Vitalize| for more information. >
+	:Vitalize . --name={plugin_name} Vim.PowerAssert
+<
+3. You can update vital-power-assert with |:Vitalize|. >
+	:Vitalize .
+<
+4. Please add following lines in your vimrc.  >
+	let g:__vital_power_assert_config = {
+	\   '__debug__': 1
+	\ }
+<
+==============================================================================
+INTERFACE				*Vital.Vim.PowerAssert-interface*
+------------------------------------------------------------------------------
+FUNCTIONS				*Vital.Vim.PowerAssert-functions*
+
+						*Vital.Vim.PowerAssert.assert()*
+assert({string})	Assert given {string} expression. If it's true,
+			vital-power-assert does nothing, but if it's false, it
+			throws exception with descriptive graphical message.
+			If |Vital.Vim.PowerAssert-variables--debug| is false,
+			this function does nothing, so you can leave assertion
+			lines in production code if you want.
+
+			NOTE: Please |:execute| this function insteal of |:call|.
+			Examples: >
+		let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+		let l:zero = 0
+		let s:two = 2
+		execute s:assert('index(x.ary, l:zero) is# s:two')
+<			Message: >
+		vital: PowerAssert:
+		index(x.ary, l:zero) is# s:two
+		      |||     |       |   |
+		      |||     |       |   2
+		      |||     |       0
+		      |||     0
+		      ||[1, 2, 3]
+		      |{'ary': [1, 2, 3], 'power': 'assert'}
+		      -1
+<
+						*Vital.Vim.PowerAssert.define()*
+define({string})	Define assertion command. {string} will be command
+			name. You can use defined command to assert expression
+			like |Vital.Vim.PowerAssert.assert()|.
+
+			NOTE: Please define assertion command for each file
+			if you want to use |s:var| for expression to assert.
+			Since, this function defines new |:commnd|, you should
+			not leave this functio and assertion command in
+			production code. I strongly recommend to use command
+			assertion only in testing framework like
+			|themis.vim| [1].
+
+			[1]: https://github.com/thinca/vim-themis
+
+			Examples: >
+		let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+		let l:zero = 0
+		let s:two = 2
+		PowerAssert index(x.ary, l:zero) is# s:two
+<			Message: >
+		vital: PowerAssert:
+		index(x.ary, l:zero) is# s:two
+		      |||     |       |   |
+		      |||     |       |   2
+		      |||     |       0
+		      |||     0
+		      ||[1, 2, 3]
+		      |{'ary': [1, 2, 3], 'power': 'assert'}
+		      -1
+<
+------------------------------------------------------------------------------
+VARIABLES				 *Vital.Vim.PowerAssert-variables*
+					 *g:__vital_power_assert_config*
+
+config.__debug__		*Vital.Vim.PowerAssert-variables--debug*
+			Type: Boolean (0 or 1)
+			Default: 0
+			Do not run assertions if it's false.
+			NOTE: Please add following lines in your vimrc.  >
+
+		let g:__vital_power_assert_config = {
+		\   '__debug__': 1
+		\ }
+
+config.__pseudo_throw__		*Vital.Vim.PowerAssert-variables--pseudo_throw*
+			Type: Boolean (0 or 1)
+			Default: 1
+			Do not use |:throw| to output descriptive messages
+			because you cannot throw message with multiple lines
+			with |:throw|.
+
+			NOTE: Please add folloing lines in |.themisrc|  to
+			use |vital-power-assert| with |.themis| [1].
+
+			[1]: https://github.com/thinca/vim-themis >
+
+		let g:__vital_power_assert_config = {
+		\   '__debug__': 1,
+		\   '__pseudo_throw__': 0
+		\ }
+
+==============================================================================
+CHANGELOG				 *Vital.Vim.PowerAssert-changelog*
+
+0.9.0	2015-08-19
+  - Init.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:fdm=marker:
