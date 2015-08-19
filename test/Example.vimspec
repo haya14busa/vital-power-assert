@@ -1,0 +1,18 @@
+Describe Example
+  Before all
+    let V = vital#of('vital')
+    let PowerAssert = V.import('Vim.PowerAssert')
+    let s:assert = PowerAssert.assert
+    execute PowerAssert.define('PowerAssert')
+  End
+
+  It throw exception with descriptive graphical message
+    Skip 'sample'
+    let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+    let l:zero = 0
+    let s:two = 2
+    PowerAssert index(x.ary, l:zero) is# s:two
+    " or
+    execute s:assert('index(x.ary, l:zero) is# s:two')
+  End
+End
