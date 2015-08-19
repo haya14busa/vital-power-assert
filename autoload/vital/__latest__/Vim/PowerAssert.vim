@@ -60,7 +60,6 @@ function! s:_assert(bool, expr_str) abort
     " same scope with caller's one by returnign comamnd with nodes to eval as
     " arguments.
     let nodes = map(s:_aggregate_nodes_to_eval(a:expr_str), 's:_node_to_eval_str(v:val)')
-    let _throw_cmd = s:_funcname('s:_throw_cmd')
     let args = printf('%s, [%s]', string(a:expr_str), join(nodes, ', '))
     let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"')
     return 'execute "execute" "' . rhs . '"'
