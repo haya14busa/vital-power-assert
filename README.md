@@ -1,6 +1,8 @@
 :muscle: vital-power-assert :muscle:
 ====================================
 
+![vital-power-assert.png (862×622)](https://raw.githubusercontent.com/haya14busa/i/master/vital-power-assert/vital-power-assert.png)
+
 [haya14busa/vital-power-assert](https://github.com/haya14busa/vital-power-assert)
 provides descriptive assertion messages with assertion function or :command.
 
