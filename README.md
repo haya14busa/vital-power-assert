@@ -3,11 +3,10 @@
 
 [![Build Status](https://travis-ci.org/haya14busa/vital-power-assert.svg?branch=master)](https://travis-ci.org/haya14busa/vital-power-assert)
 [![Build status](https://ci.appveyor.com/api/projects/status/ljx7q8a9xe58k022?svg=true)](https://ci.appveyor.com/project/haya14busa/vital-power-assert)
-[![](http://img.shields.io/github/tag/haya14busa/vital-power-assert.svg)](https://github.com/haya14busa/vital-power-assert/releases)
-[![](http://img.shields.io/github/issues/haya14busa/vital-power-assert.svg)](https://github.com/haya14busa/vital-power-assert/issues)
-[![](http://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![](http://img.shields.io/badge/doc-%3Ah%20vital-power-assert.txt-red.svg)](doc/vital-power-assert.txt)
-
+[![](https://img.shields.io/github/tag/haya14busa/vital-power-assert.svg)](https://github.com/haya14busa/vital-power-assert/releases)
+[![](https://img.shields.io/github/issues/haya14busa/vital-power-assert.svg)](https://github.com/haya14busa/vital-power-assert/issues)
+[![](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![](https://img.shields.io/badge/doc-%3Ah%20vital--power--assert.txt-red.svg)](doc/vital-power-assert.txt)
 ![vital-power-assert.png (862×622)](https://raw.githubusercontent.com/haya14busa/i/master/vital-power-assert/vital-power-assert.png)
 
 [haya14busa/vital-power-assert](https://github.com/haya14busa/vital-power-assert)
