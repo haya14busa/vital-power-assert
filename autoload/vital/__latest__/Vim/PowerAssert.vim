@@ -121,7 +121,7 @@ endfunction
 " ||  |    |
 function! s:_cols_line(cols) abort
   let max = max(a:cols)
-  let strs = map(range(max), '" "')
+  let strs = map(range(max), "' '")
   for col in a:cols
     let strs[col - 1] = '|'
   endfor
