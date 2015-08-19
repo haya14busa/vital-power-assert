@@ -44,12 +44,19 @@ INTRODUCTION				*Vital.Vim.PowerAssert-introduction*
 provides descriptive assertion messages with assertion function or :command.
 
 Assertion: >
-  let x = { 'ary': [1, 2, 3], 'power': 'assert' }
-  let l:zero = 0
-  let s:two = 2
-  PowerAssert index(x.ary, l:zero) is# s:two
-  " or
-  execute s:assert('index(x.ary, l:zero) is# s:two')
+  let s:V = vital#of('vital')
+  let s:PowerAssert = s:V.import('Vim.PowerAssert')
+  let s:assert = s:PowerAssert.assert
+  execute s:PowerAssert.define('PowerAssert')
+  function! s:power_assert() abort
+    let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+    let l:zero = 0
+    let s:two = 2
+    PowerAssert index(x.ary, l:zero) is# s:two
+    " or
+    execute s:assert('index(x.ary, l:zero) is# s:two')
+  endfunction
+  call s:power_assert()
 
 <Message: >
   vital: PowerAssert:
@@ -108,25 +115,24 @@ assert({string})	Assert given {string} expression. If it's true,
 
 			NOTE: Please |:execute| this function insteal of |:call|.
 			Examples: >
-		let x = { 'ary': [1, 2, 3], 'power': 'assert' }
-		let l:zero = 0
-		let s:two = 2
-		execute s:assert('index(x.ary, l:zero) is# s:two')
+		let s:V = vital#of('vital')
+		let s:PowerAssert = s:V.import('Vim.PowerAssert')
+		let s:assert = s:PowerAssert.assert
+		let x = 1
+		execute s:assert('x == 2')
 <			Message: >
 		vital: PowerAssert:
-		index(x.ary, l:zero) is# s:two
-		      |||     |       |   |
-		      |||     |       |   2
-		      |||     |       0
-		      |||     0
-		      ||[1, 2, 3]
-		      |{'ary': [1, 2, 3], 'power': 'assert'}
-		      -1
+		x == 2
+		| |
+		| 0
+		1
 <
 						*Vital.Vim.PowerAssert.define()*
 define({string})	Define assertion command. {string} will be command
 			name. You can use defined command to assert expression
 			like |Vital.Vim.PowerAssert.assert()|.
+
+			NOTE: Please |:execute| this function insteal of |:call|.
 
 			NOTE: Please define assertion command for each file
 			if you want to use |s:var| for expression to assert.
@@ -139,20 +145,17 @@ define({string})	Define assertion command. {string} will be command
 			[1]: https://github.com/thinca/vim-themis
 
 			Examples: >
-		let x = { 'ary': [1, 2, 3], 'power': 'assert' }
-		let l:zero = 0
-		let s:two = 2
-		PowerAssert index(x.ary, l:zero) is# s:two
+		let s:V = vital#of('vital')
+		let s:PowerAssert = s:V.import('Vim.PowerAssert')
+		execute s:PowerAssert.define('PowerAssert')
+		let x = 1
+		PowerAssert x == 2
 <			Message: >
 		vital: PowerAssert:
-		index(x.ary, l:zero) is# s:two
-		      |||     |       |   |
-		      |||     |       |   2
-		      |||     |       0
-		      |||     0
-		      ||[1, 2, 3]
-		      |{'ary': [1, 2, 3], 'power': 'assert'}
-		      -1
+		x == 2
+		| |
+		| 0
+		1
 <
 ------------------------------------------------------------------------------
 VARIABLES				 *Vital.Vim.PowerAssert-variables*
