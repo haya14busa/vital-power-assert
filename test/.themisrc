@@ -7,8 +7,6 @@ call themis#option('runtimepath', expand('~/.vim/mybundle/vital-vimlcompiler'))
 let g:Expect = themis#helper('expect')
 call themis#helper('command').with(themis#helper('assert')).with({'Expect': g:Expect})
 
-let g:vital_powerassert_pseudo_throw = 0
-
 let g:__vital_power_assert_config = {
 \   '__debug__': 1,
 \   '__pseudo_throw__': 0

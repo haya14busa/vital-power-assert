@@ -38,15 +38,15 @@ Describe PowerAssert
     End
 
     It should support expression with single quote
-      let _save = g:vital_powerassert_pseudo_throw
+      let _save = g:__vital_power_assert_config.__pseudo_throw__
       for bool in [0, 1]
-        let g:vital_powerassert_pseudo_throw = bool
+        let g:__vital_power_assert_config.__pseudo_throw__ = bool
         try
           let x = 'vim'
           execute s:assert("x != 'vi'")
           Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert("x == 'vi'")
         finally
-          let g:vital_powerassert_pseudo_throw = _save
+          let g:__vital_power_assert_config.__pseudo_throw__ = _save
         endtry
       endfor
     End
@@ -55,6 +55,7 @@ Describe PowerAssert
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('2 == 1')
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('0')
     End
+
   End
 
   Describe ._assert
