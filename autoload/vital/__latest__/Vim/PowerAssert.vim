@@ -106,7 +106,7 @@ endfunction
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
 function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
   let lines = [a:whole_expr]
-  let cols = sort(map(copy(a:evaluated_nodes), 'v:val.pos.col'), 'n')
+  let cols = s:List.sort(map(copy(a:evaluated_nodes), 'v:val.pos.col'), 'a:a - a:b')
   let lines += [s:_cols_line(cols)]
   for node_with_pos in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.pos.col'))
     let col = s:List.pop(cols)
