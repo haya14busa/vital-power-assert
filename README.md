@@ -131,7 +131,7 @@ It's better than `.assert()` because you don't have to wrap expression with stri
 since it define new command, it annoys your plugin users.
 I strongly recommend not to leave assertion command in your plugin.
 
-NOTE: To handle script-local variables, you have to define command in each file (with different name not to overwride previous one).
+NOTE: To handle script-local variables, you have to define command in each file (with different name not to overwrite previous one).
 
 I recommend to use the assert command in https://github.com/thinca/vim-themis
 
