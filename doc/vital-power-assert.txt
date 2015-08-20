@@ -113,7 +113,7 @@ assert({string})	Assert given {string} expression. If it's true,
 			this function does nothing, so you can leave assertion
 			lines in production code if you want.
 
-			NOTE: Please |:execute| this function insteal of |:call|.
+			NOTE: Please |:execute| this function instead of |:call|.
 			Examples: >
 		let s:V = vital#of('vital')
 		let s:PowerAssert = s:V.import('Vim.PowerAssert')
@@ -132,12 +132,12 @@ define({string})	Define assertion command. {string} will be command
 			name. You can use defined command to assert expression
 			like |Vital.Vim.PowerAssert.assert()|.
 
-			NOTE: Please |:execute| this function insteal of |:call|.
+			NOTE: Please |:execute| this function instead of |:call|.
 
 			NOTE: Please define assertion command for each file
 			if you want to use |s:var| for expression to assert.
-			Since, this function defines new |:commnd|, you should
-			not leave this functio and assertion command in
+			Since, this function defines new |:command|, you should
+			not leave this function and assertion command in
 			production code. I strongly recommend to use command
 			assertion only in testing framework like
 			|themis.vim| [1].
@@ -178,7 +178,7 @@ config.__pseudo_throw__		*Vital.Vim.PowerAssert-variables--pseudo_throw*
 			because you cannot throw message with multiple lines
 			with |:throw|.
 
-			NOTE: Please add folloing lines in |.themisrc|  to
+			NOTE: Please add following lines in |.themisrc|  to
 			use |vital-power-assert| with |.themis| [1].
 
 			[1]: https://github.com/thinca/vim-themis >
