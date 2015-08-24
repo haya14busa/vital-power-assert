@@ -12,10 +12,11 @@ function! s:_vital_loaded(V) abort
   let s:VimlParser = s:V.import('Vim.VimlParser').import()
   let s:VimlCompiler = s:V.import('Vim.VimlCompiler').import()
   let s:List = s:V.import('Data.List')
+  let s:String = s:V.import('Data.String')
 endfunction
 
 function! s:_vital_depends() abort
-  return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List']
+  return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List', 'Data.String']
 endfunction
 
 " @__debug__ Bool Do not run anything if it's false
@@ -26,7 +27,8 @@ endfunction
 function! s:_config() abort
   return extend({
   \   '__debug__': 0,
-  \   '__pseudo_throw__': 1
+  \   '__pseudo_throw__': 1,
+  \   '__max_length__': -1,
   \ }, get(g:, '__vital_power_assert_config', {}))
 endfunction
 
@@ -110,10 +112,18 @@ function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
   for node_with_pos in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.pos.col'))
     let col = s:List.pop(cols)
     let line = s:_cols_line(cols)
-    let line .= repeat(' ', col - len(line) - 1) . string(node_with_pos.expr)
+    let line .= repeat(' ', col - len(line) - 1) . s:_to_expr_string(node_with_pos)
     let lines += [line]
   endfor
   return lines
+endfunction
+
+function! s:_to_expr_string(node_with_pos) abort
+  let max_length = s:_config().__max_length__
+  let expr_string = string(a:node_with_pos.expr)
+  return max_length < 0
+  \ ? expr_string
+  \ : s:String.trim_end(s:String.truncate_skipping(expr_string, max_length, 1, '...'))
 endfunction
 
 " >>> echo s:_cols_line([1, 2, 5, 10])
