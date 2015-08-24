@@ -297,7 +297,10 @@ function! s:_next_evaluatable_node(node) abort
     " Right is just a accessor
     return [a:node.left]
   elseif a:node.type == s:VimlParser.NODE_CALL
-    let funcname = (a:node.left.type == s:VimlParser.NODE_CURLYNAME ? [a:node.left] : [])
+    let funcname = (
+    \   a:node.left.type == s:VimlParser.NODE_CURLYNAME ||
+    \   a:node.left.type == s:VimlParser.NODE_DOT
+    \ ) ? [a:node.left] : []
     return funcname + a:node.rlist
   elseif a:node.type == s:VimlParser.NODE_NUMBER
     return []
