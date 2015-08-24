@@ -197,6 +197,11 @@ Describe PowerAssert
       Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
     End
 
+    It call (with dot)
+      let node = sfuncs._parse_expr('x.y()')
+      Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
+    End
+
     It curlyname
       let node = sfuncs._parse_expr('x{c}y')
       Assert Equals(len(sfuncs._next_evaluatable_node(node)), 1)
