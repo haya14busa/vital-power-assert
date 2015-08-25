@@ -19,9 +19,7 @@ Describe PowerAssert
       \   "vital: PowerAssert:",
       \   "index(x.ary, l:zero) is# s:two",
       \   "     |||     |       |   |",
-      \   "     |||     |       |   2",
-      \   "     |||     |       0",
-      \   "     |||     0",
+      \   "     |||     0       0   2",
       \   "     ||\\[1, 2, 3\\]",
       \   "     |{'ary': \\[1, 2, 3\\], 'power': 'assert'}",
       \   "     -1"
