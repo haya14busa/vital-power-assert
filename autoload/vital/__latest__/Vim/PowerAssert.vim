@@ -143,8 +143,8 @@ function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
 endfunction
 
 " >>> let nodes = [
-" >>> \   {'pos': {'col': 1}, 'str_value': 'xxx'},
-" >>> \   {'pos': {'col': 10}, 'str_value': 'yyyy'}
+" >>> \   {'pos': {'col': 1}, 'str_value': "'xxx'"},
+" >>> \   {'pos': {'col': 10}, 'str_value': "'yyyy'"}
 " >>> \ ]
 " >>> let sorted_cols = [1, 7, 10, 18]
 " >>> echo s:_build_line(nodes, sorted_cols)

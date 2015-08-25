@@ -260,6 +260,18 @@ Describe PowerAssert
     End
   End
 
+  Describe ._build_line(nodes, sorted_cols)
+    It should build line
+      let nodes = [
+      \   {'pos': {'col': 1}, 'str_value': "'xxx'"},
+      \   {'pos': {'col': 10}, 'str_value': "'yyyy'"}
+      \ ]
+      let sorted_cols = [1, 7, 10, 18]
+      let expect = "'xxx' |  'yyyy'  |"
+      Assert Equals(sfuncs._build_line(nodes, sorted_cols), expect)
+    End
+  End
+
   Describe ._compile
     It should compile expression node
       let node = sfuncs._parse_expr('1 ? 2 : 3')
