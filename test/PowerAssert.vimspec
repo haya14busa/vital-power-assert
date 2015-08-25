@@ -15,19 +15,37 @@ Describe PowerAssert
   Describe descriptive message
     It should output descriptive message on failure
       execute g:PowerAssert.define('PowerAssert')
-      let msg = join([
+      let msg = escape(join([
       \   "vital: PowerAssert:",
       \   "index(x.ary, l:zero) is# s:two",
       \   "     |||     |       |   |",
       \   "     |||     0       0   2",
-      \   "     ||\\[1, 2, 3\\]",
-      \   "     |{'ary': \\[1, 2, 3\\], 'power': 'assert'}",
+      \   "     ||[1, 2, 3]",
+      \   "     |{'ary': [1, 2, 3], 'power': 'assert'}",
       \   "     -1"
-      \ ], "\n")
+      \ ], "\n"), '[]')
       let x = { 'ary': [1, 2, 3], 'power': 'assert' }
       let l:zero = 0
       let s:two = 2
       execute printf('Throws /%s/ :PowerAssert index(x.ary, l:zero) is# s:two', msg)
+      delcommand PowerAssert
+    End
+
+    It should support multibyte
+      execute g:PowerAssert.define('PowerAssert')
+      let msg = escape(join([
+      \   "vital: PowerAssert:",
+      \   "threeeeee  is# (index(x.ary, l:zero) is# s:two)",
+      \   "|          |         |||     |       |   |",
+      \   "'さん3333' 0         3||     0       0   2",
+      \   "                      |[1, 'にーーー', 3, 0]",
+      \   "                      {'ary': [1, 'にーーー', 3, 0], 'power': 'assert'}"
+      \ ], "\n"), '[]')
+      let x = { 'ary': [1, 'にーーー', 3, 0], 'power': 'assert' }
+      let l:zero = 0
+      let s:two = 2
+      let threeeeee = 'さん3333'
+      execute printf('Throws /%s/ :PowerAssert threeeeee  is# (index(x.ary, l:zero) is# s:two)', msg)
       delcommand PowerAssert
     End
   End
