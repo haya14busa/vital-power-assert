@@ -7,6 +7,8 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:INT = { 'MAX': 2147483647 }
+
 function! s:_vital_loaded(V) abort
   let s:V = a:V
   let s:VimlParser = s:V.import('Vim.VimlParser').import()
@@ -107,15 +109,57 @@ endfunction
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
 function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
   let lines = [a:whole_expr]
-  let cols = s:List.sort(map(copy(a:evaluated_nodes), 'v:val.pos.col'), 'a:a - a:b')
-  let lines += [s:_cols_line(cols)]
-  for node_with_pos in reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.pos.col'))
-    let col = s:List.pop(cols)
-    let line = s:_cols_line(cols)
-    let line .= repeat(' ', col - len(line) - 1) . s:_to_expr_string(node_with_pos)
-    let lines += [line]
-  endfor
+  " Add str_value to Node
+  let nodes = map(copy(a:evaluated_nodes),
+  \   "extend(v:val, {'str_value': s:_to_expr_string(v:val)})")
+  let reverse_sorted_cols = s:List.sort(map(nodes, 'v:val.pos.col'), 'a:a - a:b')
+  let reverse_sorted_nodes = reverse(s:List.sort_by(a:evaluated_nodes, 'v:val.pos.col'))
+
+  " 1st line
+  let lines += [s:_cols_line(reverse_sorted_cols)]
+
+  let row = 1
+  " build by row for each loop
+  while !empty(reverse_sorted_nodes)
+    let rest_nodes = []
+    let nodes_for_row = []
+    " wall moves to left... for each for loop
+    let wall = s:INT.MAX
+    for node in reverse_sorted_nodes
+      if (node.pos.col - 1) + strdisplaywidth(node.str_value) < wall
+        let nodes_for_row += [node]
+        let wall = node.pos.col - 1
+      else
+        let rest_nodes += [node]
+        let wall = node.pos.col
+      endif
+    endfor
+    let lines += [s:_build_line(nodes_for_row, reverse_sorted_cols)]
+    let reverse_sorted_cols = reverse(map(copy(rest_nodes), 'v:val.pos.col'))
+    let reverse_sorted_nodes = rest_nodes
+    let row += 1
+  endwhile
   return lines
+endfunction
+
+" >>> let nodes = [
+" >>> \   {'pos': {'col': 1}, 'str_value': 'xxx'},
+" >>> \   {'pos': {'col': 10}, 'str_value': 'yyyy'}
+" >>> \ ]
+" >>> let sorted_cols = [1, 7, 10, 18]
+" >>> echo s:_build_line(nodes, sorted_cols)
+" 'xxx' |  'yyyy'  |
+function! s:_build_line(nodes, sorted_cols) abort
+  let node_map = {}
+  for node in a:nodes
+    let node_map[node.pos.col] = node.str_value
+  endfor
+  let line = ''
+  for col in a:sorted_cols
+    let str = get(node_map, col, '|')
+    let line .= repeat(' ', col - strdisplaywidth(line) - 1) . str
+  endfor
+  return line
 endfunction
 
 function! s:_to_expr_string(node_with_pos) abort
