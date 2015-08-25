@@ -260,6 +260,27 @@ Describe PowerAssert
     End
   End
 
+  Describe ._build_assertion_graph(whole_expr, evaluated_nodes)
+    It should build graphical assertion result
+      let x = { 'ary': [1, 'にーーー', 3, 0], 'power': 'assert' }
+      let l:zero = 0
+      let s:two = 2
+      let threeeeee = 'さん3333'
+      let expr = 'threeeeee  is# (index(x.ary, l:zero) is# s:two)'
+
+      let msg = [
+      \   "threeeeee  is# (index(x.ary, l:zero) is# s:two)",
+      \   "|          |         |||     |       |   |",
+      \   "'さん3333' 0         3||     0       0   2",
+      \   "                      |[1, 'にーーー', 3, 0]",
+      \   "                      {'ary': [1, 'にーーー', 3, 0], 'power': 'assert'}"
+      \ ]
+
+      let evaluated_nodes = map(sfuncs._aggregate_node_strs_to_eval(expr), 'eval(v:val)')
+      Assert Equals(sfuncs._build_assertion_graph(expr, evaluated_nodes), msg)
+    End
+  End
+
   Describe ._build_line(nodes, sorted_cols)
     It should build line
       let nodes = [
