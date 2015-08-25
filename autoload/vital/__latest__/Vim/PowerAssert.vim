@@ -63,7 +63,7 @@ function! s:_assert(bool, expr_str) abort
     " Aggregate nodes to evaluate which we want to inspect and eval in the
     " same scope with caller's one by returnign comamnd with nodes to eval as
     " arguments.
-    let nodes = map(s:_aggregate_nodes_to_eval(a:expr_str), 's:_node_to_eval_str(v:val)')
+    let nodes = s:_aggregate_node_strs_to_eval(a:expr_str)
     let args = printf('%s, [%s]', string(a:expr_str), join(nodes, ', '))
     let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"')
     return 'execute "execute" "' . rhs . '"'
@@ -404,6 +404,12 @@ function! s:_parse_expr(expr_str) abort
   return expr_parser.parse()
 endfunction
 
+" RETURN: List[String(NODE)]
+function! s:_aggregate_node_strs_to_eval(expr_str) abort
+  return map(s:_aggregate_nodes_to_eval(a:expr_str), 's:_node_to_eval_str(v:val)')
+endfunction
+
+" RETURN: List[NODE]
 function! s:_aggregate_nodes_to_eval(expr_str) abort
   " assert !empty(empty_str)
   let node = s:_parse_expr(a:expr_str)
