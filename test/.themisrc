@@ -9,7 +9,8 @@ call themis#helper('command').with(themis#helper('assert')).with({'Expect': g:Ex
 
 let g:__vital_power_assert_config = {
 \   '__debug__': 1,
-\   '__pseudo_throw__': 0
+\   '__pseudo_throw__': 0,
+\   '__max_length__': 40
 \ }
 
 language C
