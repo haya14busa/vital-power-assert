@@ -286,6 +286,24 @@ Describe PowerAssert
     End
   End
 
+  Describe ._aggregate_node_strs_to_eval(expr_str) abort
+    It should build nodes for argument of ._assert
+      let x = { 'ary': [1, 'にーーー', 3, 0], 'power': 'assert' }
+      let l:zero = 0
+      let s:two = 2
+      let threeeeee = 'さん3333'
+      "           0        1         2         3         4
+      " col:      1234567890123456789012345678901234567890123456
+      let expr = 'threeeeee  is# (index(x.ary, l:zero) is# s:two)'
+      let result = map(sfuncs._aggregate_node_strs_to_eval(expr), 'eval(v:val)')
+      Assert Equals(len(result), 8)
+      let cols = sort([1, 12, 22, 23, 24, 30, 38, 42])
+      Assert Equals(sort(map(copy(result), 'v:val.pos.col')), cols)
+      let exprs = sort([0, 0, 0, 2, 3, 'さん3333', [1, 'にーーー', 3, 0], { 'ary': [1, 'にーーー', 3, 0], 'power': 'assert' }])
+      Assert Equals(sort(map(copy(result), 'v:val.expr')), exprs)
+    End
+  End
+
   Describe ._aggregate_nodes_to_eval
     It should aggregates nodes to eval (which we want to inspect actual value)
       let nodes = sfuncs._aggregate_nodes_to_eval('1 ? x : y.z')
