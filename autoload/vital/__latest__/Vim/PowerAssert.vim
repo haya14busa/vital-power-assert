@@ -118,7 +118,6 @@ function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
   " 1st line
   let lines += [s:_cols_line(reverse_sorted_cols)]
 
-  let row = 1
   " build by row for each loop
   while !empty(reverse_sorted_nodes)
     let rest_nodes = []
@@ -137,7 +136,6 @@ function! s:_build_assertion_graph(whole_expr, evaluated_nodes) abort
     let lines += [s:_build_line(nodes_for_row, reverse_sorted_cols)]
     let reverse_sorted_cols = reverse(map(copy(rest_nodes), 'v:val.pos.col'))
     let reverse_sorted_nodes = rest_nodes
-    let row += 1
   endwhile
   return lines
 endfunction
