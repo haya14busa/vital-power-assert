@@ -35,7 +35,7 @@ function! s:_config() abort
 endfunction
 
 function! s:define(cmdname) abort
-  let cmd = printf("'command!' '-nargs=+' '%s' ':execute' \"%s(<q-args>)\"", a:cmdname, s:_funcname('s:assert'))
+  let cmd = printf("'command!' '-complete=expression' '-nargs=+' '%s' ':execute' \"%s(<q-args>)\"", a:cmdname, s:_funcname('s:assert'))
   return 'execute ' . cmd
 endfunction
 
