@@ -89,6 +89,18 @@ Describe PowerAssert
       endfor
     End
 
+    It should support `\` in strings
+      let _save = g:__vital_power_assert_config.__pseudo_throw__
+      for bool in [0, 1]
+        let g:__vital_power_assert_config.__pseudo_throw__ = bool
+        try
+          execute s:assert("'?' != '\\?'")
+        finally
+          let g:__vital_power_assert_config.__pseudo_throw__ = _save
+        endtry
+      endfor
+    End
+
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('2 == 1')
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('0')
