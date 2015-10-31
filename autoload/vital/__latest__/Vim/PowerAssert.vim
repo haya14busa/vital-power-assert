@@ -47,7 +47,7 @@ function! s:assert(expr_str) abort
     " assert !empty(empty_str)
     let _assert = s:_funcname('s:_assert')
     let args = printf('%s, %s', a:expr_str, string(a:expr_str))
-    let rhs = escape(printf('%s(%s)', _assert, args), '"')
+    let rhs = escape(printf('%s(%s)', _assert, args), '"\')
     return 'execute "execute" "' . rhs . '"'
   else
     return ''
@@ -65,7 +65,7 @@ function! s:_assert(bool, expr_str) abort
     " arguments.
     let nodes = s:_aggregate_node_strs_to_eval(a:expr_str)
     let args = printf('%s, [%s]', string(a:expr_str), join(nodes, ', '))
-    let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"')
+    let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"\')
     return 'execute "execute" "' . rhs . '"'
   else
     return ''
@@ -103,7 +103,7 @@ function! s:_pseudo_throw_cmd(msg, ...) abort
 endfunction
 
 function! s:_build_actual_throw_cmd(msg) abort
-  return printf('throw "vital: PowerAssert:\n%s"', escape(a:msg, '"'))
+  return printf('throw "vital: PowerAssert:\n%s"', escape(a:msg, '"\'))
 endfunction
 
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]
