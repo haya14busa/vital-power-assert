@@ -41,12 +41,16 @@ endfunction
 
 " RETURN: command to execute (s:_assert()) to evaluate given expression
 " in the same scope with caller's one
-" TODO: support additional message
-function! s:assert(expr_str) abort
+" @param {string} expr_str expr_str may contain additional message for defined
+" command like `:PowerAssert 1 == 2, 'additional msg'`
+" @param {string?} additional_msg? additional_msg argument for calling this
+" func directly.
+function! s:assert(expr_str, ...) abort
   if s:_config().__debug__
+    let additional_msg = get(a:, 1, '')
     " assert !empty(empty_str)
     let _assert = s:_funcname('s:_assert')
-    let args = printf('%s, %s', a:expr_str, string(a:expr_str))
+    let args = printf('%s, %s, %s', string(a:expr_str), a:expr_str, string(additional_msg))
     let rhs = escape(printf('%s(%s)', _assert, args), '"\')
     return 'execute "execute" "' . rhs . '"'
   else
@@ -54,17 +58,22 @@ function! s:assert(expr_str) abort
   endif
 endfunction
 
-" @bool: evaluated expr_str
 " RETURN: throw command which display graphical assertion result if bool is
 " falsy
-function! s:_assert(bool, expr_str) abort
+function! s:_assert(argstr, bool, ...) abort
+  let message = get(a:, 1, '')
+  let expr_str = a:argstr
+  if message != ''
+    let expr_str = substitute(a:argstr, ',\s*[''"].*$', '', '')
+  endif
+
   " assert !empty(empty_str)
   if ! a:bool
     " Aggregate nodes to evaluate which we want to inspect and eval in the
     " same scope with caller's one by returnign comamnd with nodes to eval as
     " arguments.
-    let nodes = s:_aggregate_node_strs_to_eval(a:expr_str)
-    let args = printf('%s, [%s]', string(a:expr_str), join(nodes, ', '))
+    let nodes = s:_aggregate_node_strs_to_eval(expr_str)
+    let args = printf('%s, [%s], %s', string(expr_str), join(nodes, ', '), string(message))
     let rhs = escape(printf('%s(%s)', s:_funcname('s:_throw_cmd'), args), '"\')
     return 'execute "execute" "' . rhs . '"'
   else
@@ -74,8 +83,9 @@ endfunction
 
 " RETURN: generate pseudo-throw command with graphical assertion result
 " from evaluated_nodes which evaluated in the same scope with caller's one
-function! s:_throw_cmd(whole_expr, evaluated_nodes) abort
-  let msgs = s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
+function! s:_throw_cmd(whole_expr, evaluated_nodes, message) abort
+  let head_msg = s:String.trim_end(printf('vital: PowerAssert: %s', a:message))
+  let msgs = [head_msg] + s:_build_assertion_graph(a:whole_expr, a:evaluated_nodes)
   if s:_config().__pseudo_throw__
     return s:_pseudo_throw_cmd(join(msgs, "\n"))
   else
@@ -103,7 +113,7 @@ function! s:_pseudo_throw_cmd(msg, ...) abort
 endfunction
 
 function! s:_build_actual_throw_cmd(msg) abort
-  return printf('throw "vital: PowerAssert:\n%s"', escape(a:msg, '"\'))
+  return printf('throw "%s"', escape(a:msg, '"\'))
 endfunction
 
 " @evaluated_nodes List[{'col': Number, 'expr': Expr}]

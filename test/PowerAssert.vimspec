@@ -50,6 +50,26 @@ Describe PowerAssert
     End
   End
 
+  Describe additional message
+    It should output additional message
+      execute g:PowerAssert.define('PowerAssert')
+      let msg = escape(join([
+      \   "vital: PowerAssert: THIS IS ADDITIONAL MESSAGE",
+      \   "index(x.ary, l:zero) is# s:two",
+      \   "     |||     |       |   |",
+      \   "     |||     0       0   2",
+      \   "     ||[1, 2, 3]",
+      \   "     |{'ary': [1, 2, 3], 'power': 'assert'}",
+      \   "     -1"
+      \ ], "\n"), '[]')
+      let x = { 'ary': [1, 2, 3], 'power': 'assert' }
+      let l:zero = 0
+      let s:two = 2
+      execute printf('Throws /%s/ :PowerAssert index(x.ary, l:zero) is# s:two, ''%s''', msg, 'THIS IS ADDITIONAL MESSAGE')
+      delcommand PowerAssert
+    End
+  End
+
   Describe .assert
     It does nothing if given expression is true
       execute s:assert('1 == 1')
@@ -95,10 +115,23 @@ Describe PowerAssert
         let g:__vital_power_assert_config.__pseudo_throw__ = bool
         try
           execute s:assert("'?' != '\\?'")
+          Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert("'?' == '\\?'")
         finally
           let g:__vital_power_assert_config.__pseudo_throw__ = _save
         endtry
       endfor
+    End
+
+    It should output additional message
+      let _save = g:__vital_power_assert_config.__pseudo_throw__
+      let g:__vital_power_assert_config.__pseudo_throw__ = 0
+      try
+        let x = 'vim'
+        execute s:assert("x != 'vi'")
+        Throws /vital: PowerAssert: THIS IS ADDITIONAL MESSAGE/ :execute g:PowerAssert.assert("x == 'vi'", 'THIS IS ADDITIONAL MESSAGE')
+      finally
+        let g:__vital_power_assert_config.__pseudo_throw__ = _save
+      endtry
     End
 
     It throws abort exception with falsy expression
@@ -110,12 +143,12 @@ Describe PowerAssert
 
   Describe ._assert
     It returns empty string if bool is true
-      Assert Equals(sfuncs._assert(1, 'vim'), '')
+      Assert Equals(sfuncs._assert('vim', 1), '')
     End
 
     It throws abort exception if bool is false
       let g:sfuncs = sfuncs
-      Throws /vital: PowerAssert:/ :execute g:sfuncs._assert(0, '2 == 1')
+      Throws /vital: PowerAssert:/ :execute g:sfuncs._assert('2 == 1', 0)
       unlet g:sfuncs
     End
   End
@@ -341,8 +374,8 @@ Describe PowerAssert
     It should aggregates nodes to eval (which we want to inspect actual value)
       let nodes = sfuncs._aggregate_nodes_to_eval('1 ? x : y.z')
       Assert Equals(len(nodes), 4)
-      Assert Equals(nodes[0].expr, '(1 ? x : (y.z))')
-      Assert Equals(nodes[1].expr, '(y.z)')
+      Assert Equals(nodes[0].expr, '(1 ? x : y.z)')
+      Assert Equals(nodes[1].expr, 'y.z')
       Assert Equals(nodes[2].expr, 'y')
       Assert Equals(nodes[3].expr, 'x')
     End

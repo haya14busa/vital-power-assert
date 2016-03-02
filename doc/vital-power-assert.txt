@@ -105,8 +105,8 @@ INTERFACE				*Vital.Vim.PowerAssert-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS				*Vital.Vim.PowerAssert-functions*
 
-						*Vital.Vim.PowerAssert.assert()*
-assert({string})	Assert given {string} expression. If it's true,
+assert({string} [, {message}])			*Vital.Vim.PowerAssert.assert()*
+			Assert given {string} expression. If it's true,
 			vital-power-assert does nothing, but if it's false, it
 			throws exception with descriptive graphical message.
 			If |Vital.Vim.PowerAssert-variables--debug| is false,
@@ -127,8 +127,8 @@ assert({string})	Assert given {string} expression. If it's true,
 		| 0
 		1
 <
-						*Vital.Vim.PowerAssert.define()*
-define({string})	Define assertion command. {string} will be command
+define({string})				*Vital.Vim.PowerAssert.define()*
+			Define assertion command. {string} will be command
 			name. You can use defined command to assert expression
 			like |Vital.Vim.PowerAssert.assert()|.
 
@@ -152,6 +152,15 @@ define({string})	Define assertion command. {string} will be command
 		PowerAssert x == 2
 <			Message: >
 		vital: PowerAssert:
+		x == 2
+		| |
+		| 0
+		1
+<			Examples with message: >
+		let x = 1
+		PowerAssert x == 2, 'x should be 2'
+<			Message: >
+		vital: PowerAssert: x should be 2
 		x == 2
 		| |
 		| 0
