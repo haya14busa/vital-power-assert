@@ -61,14 +61,13 @@ endfunction
 " RETURN: throw command which display graphical assertion result if bool is
 " falsy
 function! s:_assert(argstr, bool, ...) abort
-  let message = get(a:, 1, '')
-  let expr_str = a:argstr
-  if message != ''
-    let expr_str = substitute(a:argstr, ',\s*[''"].*$', '', '')
-  endif
-
   " assert !empty(empty_str)
   if ! a:bool
+    let message = get(a:, 1, '')
+    let expr_str = a:argstr
+    if message != ''
+      let expr_str = substitute(a:argstr, ',\s*[''"].*$', '', '')
+    endif
     " Aggregate nodes to evaluate which we want to inspect and eval in the
     " same scope with caller's one by returnign comamnd with nodes to eval as
     " arguments.
