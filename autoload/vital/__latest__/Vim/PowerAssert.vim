@@ -15,10 +15,11 @@ function! s:_vital_loaded(V) abort
   let s:VimlCompiler = s:V.import('Vim.VimlCompiler').import()
   let s:List = s:V.import('Data.List')
   let s:String = s:V.import('Data.String')
+  let s:SafeString = s:V.import('Vim.SafeString')
 endfunction
 
 function! s:_vital_depends() abort
-  return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List', 'Data.String']
+  return ['Vim.VimlParser', 'Vim.VimlCompiler', 'Data.List', 'Data.String', 'Vim.SafeString']
 endfunction
 
 " @__debug__ Bool Do not run anything if it's false
@@ -171,7 +172,7 @@ endfunction
 
 function! s:_to_expr_string(node_with_pos) abort
   let max_length = s:_config().__max_length__
-  let expr_string = string(a:node_with_pos.expr)
+  let expr_string = s:SafeString.string(a:node_with_pos.expr)
   return max_length < 0
   \ ? expr_string
   \ : s:String.trim_end(s:String.truncate_skipping(expr_string, max_length, 1, '...'))
