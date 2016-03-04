@@ -66,7 +66,7 @@ function! s:_assert(argstr, bool, ...) abort
   if ! a:bool
     let message = get(a:, 1, '')
     let expr_str = a:argstr
-    if message != ''
+    if message !=# ''
       let expr_str = substitute(a:argstr, ',\s*[''"].*$', '', '')
     endif
     " Aggregate nodes to evaluate which we want to inspect and eval in the
