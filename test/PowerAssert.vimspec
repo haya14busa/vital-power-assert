@@ -134,6 +134,19 @@ Describe PowerAssert
       endtry
     End
 
+    It should support nested dict
+      let _save = g:__vital_power_assert_config.__pseudo_throw__
+      let g:__vital_power_assert_config.__pseudo_throw__ = 0
+      try
+        let d = {}
+        let d.d = d
+        execute s:assert("d != {}")
+        Throws /vital: PowerAssert: Expected Error/ :execute g:PowerAssert.assert("d == {}", 'Expected Error')
+      finally
+        let g:__vital_power_assert_config.__pseudo_throw__ = _save
+      endtry
+    End
+
     It throws abort exception with falsy expression
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('2 == 1')
       Throws /vital: PowerAssert:/ :execute g:PowerAssert.assert('0')

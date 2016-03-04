@@ -3,6 +3,7 @@ call themis#option('recursive', 1)
 " XXX: For development
 call themis#option('runtimepath', expand('~/.vim/bundle/vital.vim'))
 call themis#option('runtimepath', expand('~/.vim/bundle/vital-vimlcompiler'))
+call themis#option('runtimepath', expand('~/.vim/bundle/vital-safe-string'))
 
 let g:Expect = themis#helper('expect')
 call themis#helper('command').with(themis#helper('assert')).with({'Expect': g:Expect})
