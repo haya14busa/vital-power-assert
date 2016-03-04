@@ -11,6 +11,7 @@ install:
   - git clone --quiet https://github.com/thinca/vim-themis --branch v1.4.1 --single-branch --depth 1 themis
   - git clone --quiet https://github.com/vim-jp/vital.vim.git vital
   - git clone --quiet https://github.com/haya14busa/vital-vimlcompiler vital-vimlcompiler
+  - git clone --quiet https://github.com/haya14busa/vital-safe-string vital-safe-string
   - ps: |
       $zip = $Env:APPVEYOR_BUILD_FOLDER + '\vim.zip'
       $vim = $Env:APPVEYOR_BUILD_FOLDER + '\vim\'
@@ -23,4 +24,4 @@ before_test:
       & $Env:THEMIS_VIM --version
 test_script:
   - ps: |
-      .\themis\bin\themis.bat -r --runtimepath vital --runtimepath vital-vimlcompiler --reporter spec
+      .\themis\bin\themis.bat -r --runtimepath vital --runtimepath vital-vimlcompiler --runtimepath vital-safe-string --reporter spec

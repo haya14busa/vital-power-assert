@@ -31,6 +31,7 @@ install:
   # testing helper
   - git clone https://github.com/vim-jp/vital.vim /tmp/vital.vim  # for testing if required
   - git clone https://github.com/haya14busa/vital-vimlcompiler /tmp/vital-vimlcompiler
+  - git clone https://github.com/haya14busa/vital-safe-string /tmp/vital-safe-string
 
 before_script:
   - vim --version
@@ -42,4 +43,4 @@ script:
   - if [ -e doc/ ]; then vim --cmd 'try | helptags doc/ | catch | cquit | endtry' --cmd 'quit'; fi
   - sh /tmp/vim-vimlint/bin/vimlint.sh -l /tmp/vim-vimlint -p /tmp/vim-vimlparser -e EVL103=1 -e EVL102.l:_=1 -c func_abort=1 ./autoload/vital/__latest__/Vim/PowerAssert.vim
   - vint --color ./autoload/vital/__latest__/Vim/PowerAssert.vim
-  - /tmp/vim-themis/bin/themis --runtimepath /tmp/vital.vim --runtimepath /tmp/vital-vimlcompiler --reporter spec
+  - /tmp/vim-themis/bin/themis --runtimepath /tmp/vital.vim --runtimepath /tmp/vital-vimlcompiler --runtimepath /tmp/vital-safe-string --reporter spec
