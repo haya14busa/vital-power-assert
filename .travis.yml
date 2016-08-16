@@ -41,6 +41,6 @@ script:
   - which -a vim
   - vim --cmd version --cmd quit
   - if [ -e doc/ ]; then vim --cmd 'try | helptags doc/ | catch | cquit | endtry' --cmd 'quit'; fi
-  - sh /tmp/vim-vimlint/bin/vimlint.sh -l /tmp/vim-vimlint -p /tmp/vim-vimlparser -e EVL103=1 -e EVL102.l:_=1 -c func_abort=1 ./autoload/vital/__latest__/Vim/PowerAssert.vim
-  - vint --color ./autoload/vital/__latest__/Vim/PowerAssert.vim
+  - sh /tmp/vim-vimlint/bin/vimlint.sh -l /tmp/vim-vimlint -p /tmp/vim-vimlparser -e EVL103=1 -e EVL102.l:_=1 -c func_abort=1 ./autoload/vital/__powerassert__/Vim/PowerAssert.vim
+  - vint --color ./autoload/vital/__powerassert__/Vim/PowerAssert.vim
   - /tmp/vim-themis/bin/themis --runtimepath /tmp/vital.vim --runtimepath /tmp/vital-vimlcompiler --runtimepath /tmp/vital-safe-string --reporter spec
