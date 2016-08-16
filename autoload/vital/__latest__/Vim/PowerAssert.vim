@@ -457,6 +457,7 @@ function! s:_parse_cmd_trail_msg(arg) abort
   let xs = split(a:arg, '\v^.*\zs,\s*\ze([''"]).{-}\1\s*$')
   let body = xs[0]
   let quoted_msg = get(xs, 1, '')
+  " XXX: it doen't handle '' in single quote...
   let message = quoted_msg !=# '' ? quoted_msg[1:-2] : quoted_msg
   return [body, message]
 endfunction

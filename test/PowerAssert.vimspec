@@ -512,6 +512,42 @@ Describe PowerAssert
       End
     End
 
+    Describe s:_parse_cmd_trail_msg()
+      It should parse optional trailing message for :command
+        let tests = [
+        \   {
+        \      'name': 'no msg',
+        \      'in': 'x == 1',
+        \      'want': ['x == 1', ''],
+        \   },
+        \   {
+        \      'name': 'double quote',
+        \      'in': 'x == 1, "x is one (comment)"',
+        \      'want': ['x == 1', 'x is one (comment)'],
+        \   },
+        \   {
+        \      'name': '\" in "',
+        \      'in': 'x == 1, "hoge \" foo"',
+        \      'want': ['x == 1', 'hoge \" foo'],
+        \   },
+        \   {
+        \      'name': 'single quote',
+        \      'in': "x == 1, 'hoge foo'",
+        \      'want': ['x == 1', 'hoge foo'],
+        \   },
+        \   {
+        \      'name': ', in function arg',
+        \      'in': "has_key({}, 'x'), 'hoge foo'",
+        \      'want': ['has_key({}, ''x'')', 'hoge foo'],
+        \   },
+        \ ]
+        for tt in tests
+          let got = sfuncs._parse_cmd_trail_msg(tt.in)
+          Assert Equals(got, tt.want, tt.name)
+        endfor
+      End
+    End
+
   End
 
 End
