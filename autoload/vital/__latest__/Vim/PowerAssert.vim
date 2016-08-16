@@ -67,7 +67,10 @@ function! s:_assert(argstr, bool, ...) abort
     let message = get(a:, 1, '')
     let expr_str = a:argstr
     if message !=# ''
-      let expr_str = substitute(a:argstr, ',\s*[''"].*$', '', '')
+      " expr_str(a:argstr) may contain message even though message is given as an
+      " argument if this func(including a:argstr) is used for defined
+      " assertion :command.
+      let [expr_str, _] = s:_parse_cmd_trail_msg(expr_str)
     endif
     " Aggregate nodes to evaluate which we want to inspect and eval in the
     " same scope with caller's one by returnign comamnd with nodes to eval as
@@ -433,6 +436,29 @@ let s:_s = '<SNR>' . s:_SID() . '_'
 
 function! s:_funcname(funcname) abort
   return substitute(a:funcname, 's:', s:_s, 'g')
+endfunction
+
+" s:_parse_cmd_trail_msg() parses optional trailing message for :command.
+" The trailing message should be quoted with single or double quote and
+" followed by `,` + optional spaces. e.g. `, 'this is msg'`
+" @param {string} arg 'arg for command argument'
+" @return ({body}, {message}) 'returns cmd body and additinal msg(default is
+" Example:
+" echo s:_parse_cmd_trail_msg('x == 1, "this is msg"')
+" "                  {body} -> ^^^^^^   ^^^^^^^^^^^ <- {message}
+" echo s:_parse_cmd_trail_msg('x == 1') " {message} is optional
+" Output:
+" ['x == 1', 'this is msg']
+" ['x == 1', '']
+function! s:_parse_cmd_trail_msg(arg) abort
+  " ^.* is for avoiding to match middle comma by matching greedy.
+  " e.g.: has_key({}, 'x'), 'flags'
+  "                 ^ <- avoid!
+  let xs = split(a:arg, '\v^.*\zs,\s*\ze([''"]).{-}\1\s*$')
+  let body = xs[0]
+  let quoted_msg = get(xs, 1, '')
+  let message = quoted_msg !=# '' ? quoted_msg[1:-2] : quoted_msg
+  return [body, message]
 endfunction
 
 let &cpo = s:save_cpo
