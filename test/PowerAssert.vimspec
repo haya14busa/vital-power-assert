@@ -540,6 +540,16 @@ Describe PowerAssert
         \      'in': "has_key({}, 'x'), 'hoge foo'",
         \      'want': ['has_key({}, ''x'')', 'hoge foo'],
         \   },
+        \   {
+        \      'name': 'empty string',
+        \      'in': 'x == 1, ""',
+        \      'want': ['x == 1', ''],
+        \   },
+        \   {
+        \      'name': 'quoted',
+        \      'in': "'x == 1, \"a\"'",
+        \      'want': ["'x == 1, \"a\"'", ''],
+        \   },
         \ ]
         for tt in tests
           let got = sfuncs._parse_cmd_trail_msg(tt.in)
