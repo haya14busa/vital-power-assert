@@ -1,5 +1,5 @@
 "=============================================================================
-" FILE: autoload/vital/__latest__/Vim/PowerAssert.vim
+" FILE: autoload/vital/__powerassert__/Vim/PowerAssert.vim
 " AUTHOR: haya14busa
 " License: MIT license
 "=============================================================================

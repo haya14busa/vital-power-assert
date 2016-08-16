@@ -5,7 +5,7 @@ Describe PowerAssert
     let g:PowerAssert = V.import('Vim.PowerAssert')
     let s:assert = g:PowerAssert.assert
     let ScriptLocal = V.import('Vim.ScriptLocal')
-    let sfuncs = ScriptLocal.sfuncs('autoload/vital/__latest__/Vim/PowerAssert.vim')
+    let sfuncs = ScriptLocal.sfuncs('autoload/vital/__powerassert__/Vim/PowerAssert.vim')
   End
 
   function! CheckThrow(expr) abort
