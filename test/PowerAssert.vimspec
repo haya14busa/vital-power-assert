@@ -68,6 +68,12 @@ Describe PowerAssert
       execute printf('Throws /%s/ :PowerAssert index(x.ary, l:zero) is# s:two, ''%s''', msg, 'THIS IS ADDITIONAL MESSAGE')
       delcommand PowerAssert
     End
+
+    It should be parsed and handled correctly
+      execute g:PowerAssert.define('PowerAssert')
+      Throws /vital: PowerAssert: hoge foo/ :PowerAssert has_key({}, 'x'), 'hoge foo'
+      delcommand PowerAssert
+    End
   End
 
   Describe .assert
