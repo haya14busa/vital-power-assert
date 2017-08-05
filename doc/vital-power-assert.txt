@@ -44,7 +44,7 @@ INTRODUCTION				*Vital.Vim.PowerAssert-introduction*
 provides descriptive assertion messages with assertion function or :command.
 
 Assertion: >
-  let s:V = vital#of('vital')
+  let s:V = vital#vital#new()
   let s:PowerAssert = s:V.import('Vim.PowerAssert')
   let s:assert = s:PowerAssert.assert
   execute s:PowerAssert.define('PowerAssert')
@@ -116,7 +116,7 @@ assert({string} [, {message}])			*Vital.Vim.PowerAssert.assert()*
 
 			NOTE: Please |:execute| this function instead of |:call|.
 			Examples: >
-		let s:V = vital#of('vital')
+		let s:V = vital#vital#new()
 		let s:PowerAssert = s:V.import('Vim.PowerAssert')
 		let s:assert = s:PowerAssert.assert
 		let x = 1
@@ -147,7 +147,7 @@ define({string})				*Vital.Vim.PowerAssert.define()*
 			[1]: https://github.com/thinca/vim-themis
 
 			Examples: >
-		let s:V = vital#of('vital')
+		let s:V = vital#vital#new()
 		let s:PowerAssert = s:V.import('Vim.PowerAssert')
 		execute s:PowerAssert.define('PowerAssert')
 		let x = 1

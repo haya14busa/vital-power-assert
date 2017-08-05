@@ -1,8 +1,7 @@
 Describe command
 
   Before all
-    let V = vital#of('vital')
-    let PowerAssert = V.import('Vim.PowerAssert')
+    let g:PowerAssert = vital#vital#import('Vim.PowerAssert')
     " to see script-local scope
     execute PowerAssert.define('AssertCmd')
   End

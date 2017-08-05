@@ -13,7 +13,7 @@
 provides descriptive assertion messages with assertion function or :command.
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 let s:assert = s:PowerAssert.assert
 execute s:PowerAssert.define('PowerAssert')
@@ -89,7 +89,7 @@ they does nothing unless `g:__vital_power_assert_config.__debug__` is true.
 ### Function (`.assert()`)
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 let s:assert = s:PowerAssert.assert
 let x = 1
@@ -113,7 +113,7 @@ assertion lines in production code if you want.
 ### Command (`.define()`)
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 execute s:PowerAssert.define('PowerAssert')
 let x = 1
@@ -154,7 +154,7 @@ let g:__vital_power_assert_config = {
 ```vim
 Describe Example
   Before all
-    let V = vital#of('vital')
+    let V = vital#vital#new()
     let PowerAssert = V.import('Vim.PowerAssert')
     execute PowerAssert.define('PowerAssert')
     " or

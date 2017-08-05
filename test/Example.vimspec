@@ -1,6 +1,6 @@
 Describe Example
   Before all
-    let V = vital#of('vital')
+    let V = vital#vital#new()
     let PowerAssert = V.import('Vim.PowerAssert')
     let s:assert = PowerAssert.assert
     execute PowerAssert.define('PowerAssert')

@@ -1,8 +1,7 @@
 Describe TODO
 
   Before all
-    let V = vital#of('vital')
-    let PowerAssert = V.import('Vim.PowerAssert')
+    let PowerAssert = vital#vital#import('Vim.PowerAssert')
     let s:assert = PowerAssert.assert
   End
 
