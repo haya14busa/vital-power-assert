@@ -78,14 +78,17 @@ favorite plugin manager.  >
 	NeoBundle 'vim-jp/vital.vim'
 	NeoBundle 'haya14busa/vital-vimlcompiler'
 	NeoBundle 'haya14busa/vital-power-assert'
+	NeoBundle 'haya14busa/vital-safe-string'
 
 	Plugin 'vim-jp/vital.vim'
 	Plugin 'haya14busa/vital-vimlcompiler'
 	Plugin 'haya14busa/vital-power-assert'
+	Plugin 'haya14busa/vital-safe-string'
 
 	Plug 'vim-jp/vital.vim'
 	Plug 'haya14busa/vital-vimlcompiler'
 	Plug 'haya14busa/vital-power-assert'
+	Plug 'haya14busa/vital-safe-string'
 <
 2. Embed vital-power-assert into your plugin with |:Vitalize|
 (assume current directory is the root of your plugin repository).
