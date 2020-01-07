@@ -1,7 +1,7 @@
 Describe PowerAssert
 
   Before all
-    let V = vital#of('vital')
+    let V = vital#vital#new()
     let g:PowerAssert = V.import('Vim.PowerAssert')
     let s:assert = g:PowerAssert.assert
     let ScriptLocal = V.import('Vim.ScriptLocal')

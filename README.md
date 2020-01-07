@@ -13,7 +13,7 @@
 provides descriptive assertion messages with assertion function or :command.
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 let s:assert = s:PowerAssert.assert
 execute s:PowerAssert.define('PowerAssert')
@@ -51,14 +51,17 @@ Installation
 NeoBundle 'vim-jp/vital.vim'
 NeoBundle 'haya14busa/vital-vimlcompiler'
 NeoBundle 'haya14busa/vital-power-assert'
+NeoBundle 'haya14busa/vital-safe-string'
 
 Plugin 'vim-jp/vital.vim'
 Plugin 'haya14busa/vital-vimlcompiler'
 Plugin 'haya14busa/vital-power-assert'
+Plugin 'haya14busa/vital-safe-string'
 
 Plug 'vim-jp/vital.vim'
 Plug 'haya14busa/vital-vimlcompiler'
 Plug 'haya14busa/vital-power-assert'
+Plug 'haya14busa/vital-safe-string'
 ```
 
 ### 2. Embed vital-power-assert into your plugin with |:Vitalize| (assume current directory is the root of your plugin repository).
@@ -89,7 +92,7 @@ they does nothing unless `g:__vital_power_assert_config.__debug__` is true.
 ### Function (`.assert()`)
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 let s:assert = s:PowerAssert.assert
 let x = 1
@@ -113,7 +116,7 @@ assertion lines in production code if you want.
 ### Command (`.define()`)
 
 ```vim
-let s:V = vital#of('vital')
+let s:V = vital#vital#new()
 let s:PowerAssert = s:V.import('Vim.PowerAssert')
 execute s:PowerAssert.define('PowerAssert')
 let x = 1
@@ -154,7 +157,7 @@ let g:__vital_power_assert_config = {
 ```vim
 Describe Example
   Before all
-    let V = vital#of('vital')
+    let V = vital#vital#new()
     let PowerAssert = V.import('Vim.PowerAssert')
     execute PowerAssert.define('PowerAssert')
     " or

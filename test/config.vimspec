@@ -1,8 +1,7 @@
 Describe config
 
   Before all
-    let V = vital#of('vital')
-    let g:PowerAssert = V.import('Vim.PowerAssert')
+    let g:PowerAssert = vital#vital#import('Vim.PowerAssert')
     let s:assert = g:PowerAssert.assert
   End
 
